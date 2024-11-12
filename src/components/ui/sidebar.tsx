@@ -730,99 +730,28 @@ const SidebarMenuSubButton = React.forwardRef<
         asChild?: boolean;
         size?: 'sm' | 'md';
         isActive?: boolean;
-        id?: string;
     }
->(
-    (
-        { asChild = false, size = 'md', isActive, id, className, ...props },
-        ref,
-    ) => {
-        const Comp = asChild ? Slot : 'a';
+>(({ asChild = false, size = 'md', isActive, className, ...props }, ref) => {
+    const Comp = asChild ? Slot : 'a';
 
-        const [file, setFile] = useState<File>();
-
-        const onDrop = useCallback((acceptedFiles: File[]) => {
-            setFile(acceptedFiles[0]);
-        }, []);
-
-        useEffect(() => {
-            if (file) {
-                const handleUpload = async () => {
-                    if (!file) return;
-
-                    const reader = new FileReader();
-                    reader.onload = async (e) => {
-                        const base64Data = e.target?.result
-                            ?.toString()
-                            .split(',')[1]; // Get base64 part
-                        if (base64Data) {
-                            try {
-                                const response = await fetch(
-                                    '/api/routes/files',
-                                    {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({
-                                            fileName: file.name,
-                                            fileType: file.type,
-                                            fileData: base64Data,
-                                            folderName: id,
-                                        }),
-                                    },
-                                );
-
-                                const data = await response.json();
-
-                                if (response.ok) {
-                                    console.log(
-                                        'File uploaded successfully:',
-                                        id,
-                                        data,
-                                    );
-                                } else {
-                                    console.error('File upload failed.');
-                                }
-                            } catch (error) {
-                                console.error('Error uploading file:', error);
-                            }
-                        }
-                    };
-                    reader.readAsDataURL(file); // Read the file as a data URL
-                };
-                handleUpload();
-            }
-        }, [file]);
-
-        const { getRootProps, getInputProps, isDragActive } = useDropzone({
-            onDrop,
-        });
-
-        return (
-            <div {...getRootProps()}>
-                <input {...getInputProps()} />
-                <Comp
-                    ref={ref}
-                    data-sidebar='menu-sub-button'
-                    data-size={size}
-                    data-active={isActive}
-                    className={cn(
-                        'flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground',
-                        'data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground',
-                        size === 'sm' && 'text-xs',
-                        size === 'md' && 'text-sm',
-                        'group-data-[collapsible=icon]:hidden',
-                        'dropzone',
-                        isDragActive ? 'opacity-80 border-b' : '',
-                        className,
-                    )}
-                    {...props}
-                />
-            </div>
-        );
-    },
-);
+    return (
+        <Comp
+            ref={ref}
+            data-sidebar='menu-sub-button'
+            data-size={size}
+            data-active={isActive}
+            className={cn(
+                'flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground',
+                'data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground',
+                size === 'sm' && 'text-xs',
+                size === 'md' && 'text-sm',
+                'group-data-[collapsible=icon]:hidden',
+                className,
+            )}
+            {...props}
+        />
+    );
+});
 SidebarMenuSubButton.displayName = 'SidebarMenuSubButton';
 
 export {

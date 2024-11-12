@@ -10,10 +10,13 @@ export async function POST(request: NextRequest, response: NextResponse) {
     try {
         const body = await request.json();
         const data = await uploadFile(body);
-        if (data !== 'ok') {
+        if (data?.error) {
             return NextResponse.json({ success: false, data });
         } else {
-            return NextResponse.json({ success: true, data });
+            const url = request.nextUrl.clone();
+            url.pathname = data!.data!.path.split('/').slice(1).join('/');
+            return NextResponse.redirect(url);
+            // return NextResponse.json({ success: true, data });
         }
     } catch (error) {
         console.error('Error uploading file:', error);

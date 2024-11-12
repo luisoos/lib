@@ -73,8 +73,6 @@ export async function uploadFile(body: any) {
     // Decode the base64 file data
     const buffer = Buffer.from(fileData, 'base64');
 
-    console.log(folder);
-
     try {
         const { data, error } = await supabase.storage
             .from(env.SUPABASE_BUCKET_NAME)
@@ -82,11 +80,7 @@ export async function uploadFile(body: any) {
                 contentType: fileType,
                 upsert: true,
             });
-        if (error) {
-            return error;
-        } else {
-            return 'ok';
-        }
+        return { data, error };
     } catch (error) {
         console.log(error);
     }

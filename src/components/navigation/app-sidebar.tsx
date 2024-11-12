@@ -13,6 +13,7 @@ import {
 } from '~/components/ui/sidebar';
 import { NavMainItem, Project, User } from '~/types/dashboard/sidebar';
 import { env } from '~/env';
+import Dropzone from '../controls/Dropzone';
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
     navMain?: NavMainItem[];
@@ -34,7 +35,12 @@ export function AppSidebar({
                 </p>
             </SidebarHeader>
             <SidebarContent>
-                {navMain && <NavMain items={navMain} />}
+                {navMain ? (
+                    <NavMain items={navMain} />
+                ) : (
+                    'Start by uploading a file or creating a file.'
+                )}
+                <Dropzone id={''} className='h-full' />
                 {/* <NavProjects projects={projects} /> */}
             </SidebarContent>
             <SidebarFooter>

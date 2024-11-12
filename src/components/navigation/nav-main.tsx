@@ -19,7 +19,8 @@ import {
 import { NavMainItem } from '~/types/dashboard/sidebar';
 import { RecursiveMenuItem } from '~/components/ui/recursiveMenuItem';
 import { DynamicIcon, LucideIconName } from '~/hooks/icons';
-import FileUpload from '~/components/FileUpload';
+import FileUpload from '~/components/controls/FileUpload';
+import Dropzone from '~/components/controls/Dropzone';
 
 export function NavMain({
     items,
@@ -46,27 +47,32 @@ export function NavMain({
                         defaultOpen={item.isActive}
                         className='group/collapsible'>
                         <SidebarMenuItem>
-                            <CollapsibleTrigger asChild>
-                                <SidebarMenuButton tooltip={item.title}>
-                                    {item.icon && (
-                                        <DynamicIcon
-                                            name={item.icon as LucideIconName}
-                                        />
-                                    )}
-                                    <span className='truncate'>
-                                        {item.title}
-                                    </span>
-                                    {item.items && (
-                                        <Lucide.ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-                                    )}
-                                </SidebarMenuButton>
-                            </CollapsibleTrigger>
+                            <Dropzone id={item.url ?? item.title}>
+                                <CollapsibleTrigger asChild>
+                                    <SidebarMenuButton tooltip={item.title}>
+                                        {item.icon && (
+                                            <DynamicIcon
+                                                name={
+                                                    item.icon as LucideIconName
+                                                }
+                                            />
+                                        )}
+                                        <span className='truncate'>
+                                            {item.title}
+                                        </span>
+                                        {item.items && (
+                                            <Lucide.ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                                        )}
+                                    </SidebarMenuButton>
+                                </CollapsibleTrigger>
+                            </Dropzone>
                             <CollapsibleContent>
                                 <SidebarMenuSub>
                                     {item.items?.map((subItem) => (
                                         <RecursiveMenuItem
                                             key={subItem.title}
                                             item={subItem}
+                                            path={item.url ?? item.title}
                                         />
                                     ))}
                                 </SidebarMenuSub>
