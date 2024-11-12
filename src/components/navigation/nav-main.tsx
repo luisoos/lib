@@ -34,7 +34,7 @@ export function NavMain({
 }) {
     return (
         <SidebarGroup>
-            <div className="flex">
+            <div className='flex'>
                 <SidebarGroupLabel>Notebooks</SidebarGroupLabel>
                 <FileUpload />
             </div>
@@ -53,8 +53,12 @@ export function NavMain({
                                             name={item.icon as LucideIconName}
                                         />
                                     )}
-                                    <span>{item.title}</span>
-                                    <Lucide.ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                                    <span className='truncate'>
+                                        {item.title}
+                                    </span>
+                                    {item.items && (
+                                        <Lucide.ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                                    )}
                                 </SidebarMenuButton>
                             </CollapsibleTrigger>
                             <CollapsibleContent>

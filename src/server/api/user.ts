@@ -13,7 +13,7 @@ const getUserByEmailSchema = z.object({
 export async function getProfile() {
     const session = await getServerSideSession(); // Get session info
     if (!session || !session.user) {
-        return redirect('auth/signin')
+        return redirect('auth/signin');
     }
 
     const user = await db.user.findFirst({
@@ -25,9 +25,8 @@ export async function getProfile() {
 
 // Action to get a user by email
 export async function getUserByEmail(input: { email: string }) {
-
     const parsedInput = getUserByEmailSchema.parse(input);
-    
+
     const user = await db.user.findFirst({
         where: { email: parsedInput.email },
     });

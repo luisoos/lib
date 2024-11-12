@@ -709,7 +709,7 @@ const SidebarMenuSub = React.forwardRef<
         ref={ref}
         data-sidebar='menu-sub'
         className={cn(
-            'mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5',
+            'mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border border-zinc-500 px-2.5 py-0.5',
             'group-data-[collapsible=icon]:hidden',
             className,
         )}
@@ -730,76 +730,99 @@ const SidebarMenuSubButton = React.forwardRef<
         asChild?: boolean;
         size?: 'sm' | 'md';
         isActive?: boolean;
+        id?: string;
     }
->(({ asChild = false, size = 'md', isActive, className, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'a';
+>(
+    (
+        { asChild = false, size = 'md', isActive, id, className, ...props },
+        ref,
+    ) => {
+        const Comp = asChild ? Slot : 'a';
 
-    const [file, setFile] = useState<File>();
-  
-    const onDrop = useCallback((acceptedFiles: File[]) => {
-      setFile(acceptedFiles[0]);
-    }, []); 
-    
-    // const mutation = api.files.uploadFile.useMutation();
+        const [file, setFile] = useState<File>();
 
-    // useEffect(() => {
-    //     if (file) {
-    //         const handleUpload = async () => {
-    //             if (!file) return;
-        
-    //             const reader = new FileReader();
-    //             reader.onload = async (e) => {
-    //                 const base64Data = e.target?.result?.toString().split(',')[1]; // Get base64 part
-    //                 if (base64Data) {
-    //                     try {
-    //                         const result = await mutation.mutateAsync({
-    //                             fileName: file.name,
-    //                             fileType: file.type,
-    //                             fileData: base64Data,
-    //                         });
-        
-    //                         if (result.success) {
-    //                             console.log('File uploaded successfully:', result.data);
-    //                         } else {
-    //                             console.error('File upload failed:', result.error);
-    //                         }
-    //                     } catch (error) {
-    //                         console.error('Error uploading file:', error);
-    //                     }
-    //                 }
-    //             };
-    //             reader.readAsDataURL(file); // Read the file as a data URL
-    //         };
-    //         handleUpload()
-    //     }
+        const onDrop = useCallback((acceptedFiles: File[]) => {
+            setFile(acceptedFiles[0]);
+        }, []);
 
-    // }, [file]);
-  
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+        useEffect(() => {
+            if (file) {
+                const handleUpload = async () => {
+                    if (!file) return;
 
-    return (
-        <div {...getRootProps()}>
-            <input {...getInputProps()} />
-            <Comp
-                ref={ref}
-                data-sidebar='menu-sub-button'
-                data-size={size}
-                data-active={isActive}
-                className={cn(
-                    'flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground',
-                    'data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground',
-                    size === 'sm' && 'text-xs',
-                    size === 'md' && 'text-sm',
-                    'group-data-[collapsible=icon]:hidden',
-                    'dropzone', 
-                    isDragActive ? 'opacity-80 border-b' : '',
-                    className,
-                )}
-                {...props}
-            />
-        </div>
-    );
-});
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const base64Data = e.target?.result
+                            ?.toString()
+                            .split(',')[1]; // Get base64 part
+                        if (base64Data) {
+                            try {
+                                const response = await fetch(
+                                    '/api/routes/files',
+                                    {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                            fileName: file.name,
+                                            fileType: file.type,
+                                            fileData: base64Data,
+                                            folderName: id,
+                                        }),
+                                    },
+                                );
+
+                                const data = await response.json();
+
+                                if (response.ok) {
+                                    console.log(
+                                        'File uploaded successfully:',
+                                        id,
+                                        data,
+                                    );
+                                } else {
+                                    console.error('File upload failed.');
+                                }
+                            } catch (error) {
+                                console.error('Error uploading file:', error);
+                            }
+                        }
+                    };
+                    reader.readAsDataURL(file); // Read the file as a data URL
+                };
+                handleUpload();
+            }
+        }, [file]);
+
+        const { getRootProps, getInputProps, isDragActive } = useDropzone({
+            onDrop,
+        });
+
+        return (
+            <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <Comp
+                    ref={ref}
+                    data-sidebar='menu-sub-button'
+                    data-size={size}
+                    data-active={isActive}
+                    className={cn(
+                        'flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground',
+                        'data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground',
+                        size === 'sm' && 'text-xs',
+                        size === 'md' && 'text-sm',
+                        'group-data-[collapsible=icon]:hidden',
+                        'dropzone',
+                        isDragActive ? 'opacity-80 border-b' : '',
+                        className,
+                    )}
+                    {...props}
+                />
+            </div>
+        );
+    },
+);
 SidebarMenuSubButton.displayName = 'SidebarMenuSubButton';
 
 export {

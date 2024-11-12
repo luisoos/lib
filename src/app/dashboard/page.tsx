@@ -12,10 +12,11 @@ import { redirect } from 'next/navigation';
 import { getProfile } from '~/server/api/user';
 import { files } from '~/server/api/files';
 import { getServerSideSession } from '~/server/auth';
+import { mapToNavItems } from '~/hooks/files/map';
 
 export default async function Page() {
     const session = await getServerSideSession();
-    console.log(session)
+    // console.log(session)
     if (!session) redirect('auth/signin');
 
     const userQuery = await getProfile();
@@ -27,7 +28,9 @@ export default async function Page() {
     };
 
     const fsQuery = await files.getStructure();
-    const fs: NavMainItem[] = fsQuery;
+    const fs: NavMainItem[] | undefined = fsQuery
+        ? mapToNavItems(fsQuery)
+        : undefined;
 
     return (
         <>

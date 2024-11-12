@@ -37,7 +37,15 @@ declare module 'next-auth' {
  */
 export const authConfig = {
     callbacks: {
-        async session({ session, token, user }: { session: Session, token: any, user: AdapterUser }) {
+        async session({
+            session,
+            token,
+            user,
+        }: {
+            session: Session;
+            token: any;
+            user: AdapterUser;
+        }) {
             // Attach the user ID from the token to the session object
             if (token) {
                 session.user.id = token.id; // Attach user ID to session

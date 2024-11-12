@@ -15,7 +15,7 @@ import { NavMainItem, Project, User } from '~/types/dashboard/sidebar';
 import { env } from '~/env';
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-    navMain: NavMainItem[];
+    navMain?: NavMainItem[];
     projects: Project[];
     user: User;
 }
@@ -34,7 +34,7 @@ export function AppSidebar({
                 </p>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={navMain} />
+                {navMain && <NavMain items={navMain} />}
                 {/* <NavProjects projects={projects} /> */}
             </SidebarContent>
             <SidebarFooter>

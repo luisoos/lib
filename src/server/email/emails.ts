@@ -1,10 +1,14 @@
-import { env } from "process";
-import { resend } from ".";
-import type { SendVerificationRequestParams } from "next-auth/providers/email";
-import { createCaller } from "../api/root";
-import { createContext } from "~/trpc/server";
+import { env } from 'process';
+import { resend } from '.';
+import type { SendVerificationRequestParams } from 'next-auth/providers/email';
+import { createCaller } from '../api/root';
+import { createContext } from '~/trpc/server';
 
-export async function sendVerificationEmail({ identifier, url, provider }: SendVerificationRequestParams) {
+export async function sendVerificationEmail({
+    identifier,
+    url,
+    provider,
+}: SendVerificationRequestParams) {
     const { host } = new URL(url);
     const api = createCaller(createContext);
 

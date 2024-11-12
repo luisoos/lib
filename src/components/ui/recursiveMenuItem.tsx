@@ -5,13 +5,14 @@ import {
     SidebarMenuSub,
 } from './sidebar';
 import * as Lucide from 'lucide-react';
+import { DynamicIcon } from '~/hooks/icons';
 
 const RecursiveMenuItem: React.FC<{ item: NavMainItem }> = ({ item }) => {
     return (
         <SidebarMenuSubItem key={item.title}>
-            <SidebarMenuSubButton asChild>
+            <SidebarMenuSubButton asChild id={item.url ?? item.title}>
                 <a href={item.url}>
-                    <Lucide.File />
+                    <DynamicIcon name={item.icon ?? 'File'} />
                     <span>{item.title}</span>
                 </a>
             </SidebarMenuSubButton>

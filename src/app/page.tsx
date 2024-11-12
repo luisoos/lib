@@ -9,7 +9,6 @@ import { env } from '~/env';
 import { ArrowRight } from 'lucide-react';
 import { getServerSideSession } from '~/server/auth';
 
-
 export default async function Home() {
     const session = await getServerSideSession();
 

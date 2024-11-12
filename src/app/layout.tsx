@@ -16,9 +16,7 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang='en' className={`${GeistSans.variable}`}>
-            <body className='h-screen'>
-                {children}
-            </body>
+            <body className='h-screen'>{children}</body>
         </html>
     );
 }
