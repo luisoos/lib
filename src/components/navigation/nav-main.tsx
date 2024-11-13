@@ -47,7 +47,7 @@ export function NavMain({
                         defaultOpen={item.isActive}
                         className='group/collapsible'>
                         <SidebarMenuItem>
-                            <Dropzone id={item.url ?? item.title}>
+                            <Dropzone id={!item.url ? item.title : ''}>
                                 <CollapsibleTrigger asChild>
                                     <SidebarMenuButton tooltip={item.title}>
                                         {item.icon && (
@@ -66,17 +66,19 @@ export function NavMain({
                                     </SidebarMenuButton>
                                 </CollapsibleTrigger>
                             </Dropzone>
-                            <CollapsibleContent>
-                                <SidebarMenuSub>
-                                    {item.items?.map((subItem) => (
-                                        <RecursiveMenuItem
-                                            key={subItem.title}
-                                            item={subItem}
-                                            path={item.url ?? item.title}
-                                        />
-                                    ))}
-                                </SidebarMenuSub>
-                            </CollapsibleContent>
+                            {item.items && (
+                                <CollapsibleContent>
+                                    <SidebarMenuSub>
+                                        {item.items.map((subItem) => (
+                                            <RecursiveMenuItem
+                                                key={subItem.title}
+                                                item={subItem}
+                                                path={item.url ?? item.title}
+                                            />
+                                        ))}
+                                    </SidebarMenuSub>
+                                </CollapsibleContent>
+                            )}
                         </SidebarMenuItem>
                     </Collapsible>
                 ))}

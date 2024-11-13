@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { FilePlus2 } from 'lucide-react'; // Import your Lucide icon here
 import upload from '~/hooks/files/upload';
-import { redirect } from 'next/navigation';
 
 const FileUpload = () => {
     const handleFileChange = async (

@@ -6,6 +6,11 @@ import { ucfirst } from '~/hooks/utils';
 
 export type LucideIconName = keyof typeof Lucide;
 
+interface DynamicIconProps {
+    name: string;
+    [key: string]: any;
+}
+
 const getIcon = (iconName: LucideIconName): LucideIcon | undefined => {
     return Lucide[iconName] as LucideIcon | undefined;
 };
@@ -16,7 +21,7 @@ const getBackupIcon = (iconName: string): SimpleIcon | undefined => {
     ] as SimpleIcon;
 };
 
-export const DynamicIcon: React.FC<{ name: string }> = ({ name, ...props }) => {
+export const DynamicIcon: React.FC<DynamicIconProps> = ({ name, ...props }) => {
     const LucideIconComponent = getIcon(name as LucideIconName);
     if (LucideIconComponent) {
         return <LucideIconComponent {...props} />;

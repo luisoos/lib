@@ -5,7 +5,7 @@ import {
     SidebarMenuSub,
 } from './sidebar';
 import { DynamicIcon } from '~/hooks/icons';
-import Dropzone from '../controls/Dropzone';
+import Dropzone from '~/components/controls/Dropzone';
 
 const RecursiveMenuItem: React.FC<{ item: NavMainItem; path: string }> = ({
     item,

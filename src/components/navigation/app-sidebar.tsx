@@ -14,6 +14,7 @@ import {
 import { NavMainItem, Project, User } from '~/types/dashboard/sidebar';
 import { env } from '~/env';
 import Dropzone from '../controls/Dropzone';
+import FileTreeContextMenu from '~/components/controls/FileTreeContextMenu';
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
     navMain?: NavMainItem[];
@@ -34,14 +35,16 @@ export function AppSidebar({
                     {env.NEXT_PUBLIC_PROJECT_NAME}
                 </p>
             </SidebarHeader>
-            <SidebarContent>
-                {navMain ? (
-                    <NavMain items={navMain} />
-                ) : (
-                    'Start by uploading a file or creating a file.'
-                )}
-                <Dropzone id={''} className='h-full' />
-                {/* <NavProjects projects={projects} /> */}
+            <SidebarContent className='h-full'>
+                <FileTreeContextMenu id='' className='h-full'>
+                    {navMain ? (
+                        <NavMain items={navMain} />
+                    ) : (
+                        'Start by uploading a file or creating a file.'
+                    )}
+                    <Dropzone id={''} className='h-full max-h-96' />
+                    {/* <NavProjects projects={projects} /> */}
+                </FileTreeContextMenu>
             </SidebarContent>
             <SidebarFooter>
                 <NavUser user={user} />

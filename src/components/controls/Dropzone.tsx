@@ -1,17 +1,20 @@
 'use client';
 
+import React from 'react';
 import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import upload from '~/hooks/files/upload';
 import { cn } from '~/hooks/utils';
+import FileTreeContextMenu from '~/components/controls/FileTreeContextMenu';
+import ControlComponentProps from '~/types/controls/ControlComponentProps';
 
-interface DropzoneProps {
-    id: string;
-    className?: string;
-    children?: React.ReactNode;
-}
-
-const Dropzone: React.FC<DropzoneProps> = ({ id, className, children }) => {
+const Dropzone: React.FC<ControlComponentProps> = ({
+    id,
+    className,
+    children,
+}) => {
+    const hasChildren = React.Children.count(children) > 0;
+    const Comp = hasChildren ? FileTreeContextMenu : 'div';
     const [file, setFile] = useState<File>();
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -31,16 +34,18 @@ const Dropzone: React.FC<DropzoneProps> = ({ id, className, children }) => {
     }, [file]);
 
     return (
-        <div
-            {...getRootProps()}
-            className={cn(
-                'dropzone',
-                isDragActive ? 'opacity-60 transition-all delay-75' : '',
-                className,
-            )}>
-            <input {...getInputProps()} />
-            {children}
-        </div>
+        <Comp id={id}>
+            <div
+                {...getRootProps()}
+                className={cn(
+                    'dropzone',
+                    isDragActive ? 'opacity-60 transition-all delay-75' : '',
+                    className,
+                )}>
+                <input {...getInputProps()} />
+                {children}
+            </div>
+        </Comp>
     );
 };
 
