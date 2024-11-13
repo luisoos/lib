@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 
 export default async function upload(file: File | undefined, path?: string) {
     if (file) {
+        console.log(path);
         const reader = new FileReader();
 
         reader.onloadend = async () => {

@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { VariantProps, cva } from 'class-variance-authority';
-import { PanelLeft } from 'lucide-react';
+import { ChevronRight, PanelLeft } from 'lucide-react';
 
 import { useIsMobile } from '~/hooks/use-mobile';
 import { cn } from '~/hooks/utils';
@@ -21,6 +21,9 @@ import {
 
 import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { NavMainItem } from '~/types/dashboard/sidebar';
+import removeExtension from '~/hooks/files/removeExtension';
+import { DynamicIcon } from '~/hooks/icons';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -754,6 +757,19 @@ const SidebarMenuSubButton = React.forwardRef<
 });
 SidebarMenuSubButton.displayName = 'SidebarMenuSubButton';
 
+const SidebarMenuDisplay: React.FC<{ item: NavMainItem }> = ({ item }) => {
+    return (
+        <SidebarMenuButton tooltip={item.title}>
+            {item.icon && <DynamicIcon name={item.icon} />}
+            <span className='truncate'>{removeExtension(item.title)}</span>
+            {item.items && (
+                <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+            )}
+        </SidebarMenuButton>
+    );
+};
+SidebarMenuDisplay.displayName = 'SidebarMenuDisplay';
+
 export {
     Sidebar,
     SidebarContent,
@@ -769,6 +785,7 @@ export {
     SidebarMenuAction,
     SidebarMenuBadge,
     SidebarMenuButton,
+    SidebarMenuDisplay,
     SidebarMenuItem,
     SidebarMenuSkeleton,
     SidebarMenuSub,

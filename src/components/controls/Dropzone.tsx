@@ -13,8 +13,6 @@ const Dropzone: React.FC<ControlComponentProps> = ({
     className,
     children,
 }) => {
-    const hasChildren = React.Children.count(children) > 0;
-    const Comp = hasChildren ? FileTreeContextMenu : 'div';
     const [file, setFile] = useState<File>();
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -34,7 +32,7 @@ const Dropzone: React.FC<ControlComponentProps> = ({
     }, [file]);
 
     return (
-        <Comp id={id}>
+        <FileTreeContextMenu id={id} data-dropzone='true'>
             <div
                 {...getRootProps()}
                 className={cn(
@@ -45,7 +43,7 @@ const Dropzone: React.FC<ControlComponentProps> = ({
                 <input {...getInputProps()} />
                 {children}
             </div>
-        </Comp>
+        </FileTreeContextMenu>
     );
 };
 

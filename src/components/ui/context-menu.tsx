@@ -186,13 +186,12 @@ const ContextMenuAction: React.FC<{
     icon: string;
     label: string;
     className?: string;
-}> = ({ icon, label, className }) => {
+    onClick?: React.MouseEventHandler<HTMLDivElement>;
+}> = ({ icon, label, className, onClick }) => {
     return (
         <div
-            className={cn(
-                'w-full flex items-center cursor-pointer',
-                className,
-            )}>
+            className={cn('w-full flex items-center cursor-pointer', className)}
+            onClick={onClick}>
             <DynamicIcon name={icon} size={16} />
             <span className='ml-1'>{label}</span>
         </div>

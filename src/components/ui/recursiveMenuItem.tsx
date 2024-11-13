@@ -6,6 +6,9 @@ import {
 } from './sidebar';
 import { DynamicIcon } from '~/hooks/icons';
 import Dropzone from '~/components/controls/Dropzone';
+import FileTreeContextMenu from '../controls/FileTreeContextMenu';
+import removeExtension from '~/hooks/files/removeExtension';
+import getFileUrl from '~/hooks/files/getFileUrl';
 
 const RecursiveMenuItem: React.FC<{ item: NavMainItem; path: string }> = ({
     item,
@@ -13,13 +16,15 @@ const RecursiveMenuItem: React.FC<{ item: NavMainItem; path: string }> = ({
 }) => {
     const id: string = `${path}/${item.url ?? item.title}`;
     return (
-        <>
+        <FileTreeContextMenu id={id}>
             <SidebarMenuSubItem key={item.title}>
                 <Dropzone id={item.items ? id : path}>
                     <SidebarMenuSubButton asChild>
-                        <a id={item.items ? id : path} href={item.url}>
+                        <a
+                            id={item.items ? id : path}
+                            href={getFileUrl(item.url)}>
                             <DynamicIcon name={item.icon ?? 'File'} />
-                            <span>{item.title}</span>
+                            <span>{removeExtension(item.title)}</span>
                         </a>
                     </SidebarMenuSubButton>
                 </Dropzone>
@@ -35,7 +40,7 @@ const RecursiveMenuItem: React.FC<{ item: NavMainItem; path: string }> = ({
                     </SidebarMenuSub>
                 )}
             </SidebarMenuSubItem>
-        </>
+        </FileTreeContextMenu>
     );
 };
 

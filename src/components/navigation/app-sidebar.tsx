@@ -36,15 +36,15 @@ export function AppSidebar({
                 </p>
             </SidebarHeader>
             <SidebarContent className='h-full'>
-                <FileTreeContextMenu id='' className='h-full'>
-                    {navMain ? (
-                        <NavMain items={navMain} />
-                    ) : (
-                        'Start by uploading a file or creating a file.'
-                    )}
-                    <Dropzone id={''} className='h-full max-h-96' />
-                    {/* <NavProjects projects={projects} /> */}
-                </FileTreeContextMenu>
+                {/* <FileTreeContextMenu id='' className='h-full'> */}
+                {navMain ? (
+                    <NavMain items={navMain} />
+                ) : (
+                    'Start by uploading a file or creating a file.'
+                )}
+                <Dropzone id={''} className='h-full max-h-96' />
+                {/* <NavProjects projects={projects} /> */}
+                {/* </FileTreeContextMenu> */}
             </SidebarContent>
             <SidebarFooter>
                 <NavUser user={user} />

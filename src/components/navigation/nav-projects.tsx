@@ -17,6 +17,7 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '~/components/ui/sidebar';
+import getFileUrl from '~/hooks/files/getFileUrl';
 
 export function NavProjects({
     projects,
@@ -35,7 +36,7 @@ export function NavProjects({
                 {projects.map((item) => (
                     <SidebarMenuItem key={item.name}>
                         <SidebarMenuButton asChild>
-                            <a href={item.url}>
+                            <a href={getFileUrl(item.url)}>
                                 <span>{item.name}</span>
                             </a>
                         </SidebarMenuButton>

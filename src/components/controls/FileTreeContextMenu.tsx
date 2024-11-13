@@ -1,4 +1,7 @@
-import { FilePlus2, FileUp, FolderPlus, Share, Trash2 } from 'lucide-react';
+'use client';
+
+import { redirect } from 'next/navigation';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     ContextMenu,
     ContextMenuAction,
@@ -14,11 +17,37 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
     className,
     children,
 }) => {
-    const handleFileChange = async (
-        event: React.ChangeEvent<HTMLInputElement>,
-    ) => {
-        const selectedFile = event.target.files?.[0];
-        await upload(selectedFile);
+    // const [file, setFile] = useState<File>();
+
+    // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     if(event.target.files) setFile(event.target.files![0]);
+    // };
+
+    // useEffect(() => {
+    //     const uploadFile = async () => {
+    //         if (file && id) {
+    //             console.log("Uploading file with id:", id);
+    //             try {
+    //                 await upload(file, id);
+    //             } catch (error) {
+    //                 console.error("Upload failed:", error);
+    //             }
+    //         }
+    //     };
+
+    //     uploadFile();
+    // }, [file, id]);
+
+    const handleNewNoteClick = async () => {
+        console.log('Button was clicked!', id);
+        const file = new File(
+            ['This is the content of the new note.'],
+            'New Note.txt',
+            {
+                type: 'text/plain',
+            },
+        );
+        await upload(file, id);
     };
 
     return (
@@ -34,7 +63,7 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
                         {id}
                     </ContextMenuItem>
                 )}
-                <ContextMenuItem className='cursor-pointer'>
+                {/* <ContextMenuItem className='cursor-pointer'>
                     <label htmlFor='file-upload' className='w-full'>
                         <input
                             id='file-upload'
@@ -44,9 +73,13 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
                         />
                         <ContextMenuAction icon='FileUp' label='Upload File' />
                     </label>
-                </ContextMenuItem>
+                </ContextMenuItem> */}
                 <ContextMenuItem>
-                    <ContextMenuAction icon='FilePlus2' label='New Note' />
+                    <ContextMenuAction
+                        onClick={handleNewNoteClick}
+                        icon='FilePlus2'
+                        label='New Note'
+                    />
                 </ContextMenuItem>
                 <ContextMenuItem>
                     <ContextMenuAction icon='FolderPlus' label='New Folder' />
