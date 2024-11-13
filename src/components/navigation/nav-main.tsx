@@ -62,7 +62,10 @@ export function NavMain({
                                         <SidebarMenuSub>
                                             {item.items.map((subItem) => (
                                                 <RecursiveMenuItem
-                                                    key={subItem.url}
+                                                    key={
+                                                        subItem.url ??
+                                                        subItem.title
+                                                    }
                                                     item={subItem}
                                                     path={
                                                         item.url ?? item.title
@@ -75,8 +78,8 @@ export function NavMain({
                             </SidebarMenuItem>
                         </Collapsible>
                     ) : (
-                        <a href={getFileUrl(item.url)}>
-                            <SidebarMenuDisplay item={item} key={item.url} />
+                        <a href={getFileUrl(item.url)} key={item.url}>
+                            <SidebarMenuDisplay item={item} />
                         </a>
                     );
                 })}

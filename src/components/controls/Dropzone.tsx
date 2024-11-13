@@ -25,10 +25,10 @@ const Dropzone: React.FC<ControlComponentProps> = ({
     });
 
     useEffect(() => {
-        const uploadFile = async () => {
+        const uploadFile = async (id: string) => {
             await upload(file, id);
         };
-        uploadFile();
+        uploadFile(id);
     }, [file]);
 
     return (

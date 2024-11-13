@@ -1,9 +1,5 @@
 import '~/styles/globals.css';
 
-import { GeistSans } from 'geist/font/sans';
-import { type Metadata } from 'next';
-
-import { env } from '~/env';
 import { Separator } from '@radix-ui/react-separator';
 import { redirect } from 'next/navigation';
 import { AppSidebar } from '~/components/navigation/app-sidebar';
@@ -17,12 +13,6 @@ import { files } from '~/server/api/files';
 import { getProfile } from '~/server/api/user';
 import { getServerSideSession } from '~/server/auth';
 import { NavMainItem, User } from '~/types/dashboard/sidebar';
-
-export const metadata: Metadata = {
-    title: env.NEXT_PUBLIC_PROJECT_NAME,
-    description: 'Chat with your files & notes',
-    icons: [{ rel: 'icon', url: '/favicon.ico' }],
-};
 
 export default async function RootLayout({
     children,

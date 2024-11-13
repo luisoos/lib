@@ -54,6 +54,33 @@ async function listFilesInFolder(supabase: SupabaseClient, path: string) {
     return allFiles;
 }
 
+export async function getFileById(fileId: string) {
+    const supabase: SupabaseClient = createClient();
+
+    const pathResponse = await supabase
+        .from('storage.objects')
+        .select('path')
+        .eq('id', fileId)
+        .single();
+
+    if (pathResponse.error) {
+        return {
+            data: null,
+            error: 'Could not find file or corresponding path',
+            status: 404,
+        };
+    }
+
+    const { data, error } = await supabase.storage
+        .from(env.SUPABASE_BUCKET_NAME)
+        .download(pathResponse.data.path);
+
+    // TODO: Add user validation
+    // const dbUser = await getProfile();
+
+    return { data, error };
+}
+
 // Function to upload a file
 export async function uploadFile(body: any) {
     // Validate input using Zod
@@ -86,4 +113,4 @@ export async function uploadFile(body: any) {
     }
 }
 
-export const files = { getStructure, uploadFile };
+export const files = { getStructure, getFileById, uploadFile };
