@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import getFileUrl from '~/hooks/files/getFileUrl';
-import { files, getStructure, uploadFile } from '~/server/api/files';
+import { files } from '~/server/api/files';
 
 export async function GET(request: NextRequest, response: NextResponse) {
     const searchParams = request.nextUrl.searchParams;

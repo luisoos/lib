@@ -44,19 +44,19 @@ export function NavMain({
             </div>
             <SidebarMenu>
                 {items.map((item) => {
-                    item.isActive = pathname === getFileUrl(item.url);
+                    // item.isActive = pathname === getFileUrl(item.url);
                     return !item.url ? (
                         <Collapsible
-                            key={item.url}
+                            key={item.title + item.items?.length}
                             asChild
                             defaultOpen={item.isActive}
                             className='group/collapsible'>
                             <SidebarMenuItem>
-                                <Dropzone id={!item.url ? item.title : ''}>
+                                {/* <Dropzone id={!item.url ? item.title : ''}> */}
                                     <CollapsibleTrigger asChild>
                                         <SidebarMenuDisplay item={item} />
                                     </CollapsibleTrigger>
-                                </Dropzone>
+                                {/* </Dropzone> */}
                                 {item.items && (
                                     <CollapsibleContent>
                                         <SidebarMenuSub>
@@ -79,7 +79,9 @@ export function NavMain({
                         </Collapsible>
                     ) : (
                         <a href={getFileUrl(item.url)} key={item.url}>
-                            <SidebarMenuDisplay item={item} />
+                            <Dropzone id={!item.url ? item.title : ''}>
+                                <SidebarMenuDisplay item={item} />
+                            </Dropzone>
                         </a>
                     );
                 })}
