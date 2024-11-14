@@ -12,7 +12,6 @@ import {
     SidebarGroupLabel,
     SidebarMenu,
     SidebarMenuButton,
-    SidebarMenuDisplay,
     SidebarMenuItem,
     SidebarMenuSub,
 } from '~/components/ui/sidebar';
@@ -22,6 +21,8 @@ import FileUpload from '~/components/controls/FileUpload';
 import Dropzone from '~/components/controls/Dropzone';
 import getFileUrl from '~/hooks/files/getFileUrl';
 import { usePathname } from 'next/navigation';
+import { DynamicIcon, LucideIconName } from '~/hooks/icons';
+import { ChevronRight } from 'lucide-react';
 
 export function NavMain({
     items,
@@ -54,7 +55,21 @@ export function NavMain({
                             <SidebarMenuItem>
                                 {/* <Dropzone id={!item.url ? item.title : ''}> */}
                                     <CollapsibleTrigger asChild>
-                                        <SidebarMenuDisplay item={item} />
+                                        <SidebarMenuButton tooltip={item.title}>
+                                            {item.icon && (
+                                                <DynamicIcon
+                                                    name={
+                                                        item.icon as LucideIconName
+                                                    }
+                                                />
+                                            )}
+                                            <span className='truncate'>
+                                                {item.title}
+                                            </span>
+                                            {item.items && (
+                                                <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                                            )}
+                                        </SidebarMenuButton>
                                     </CollapsibleTrigger>
                                 {/* </Dropzone> */}
                                 {item.items && (
@@ -80,7 +95,21 @@ export function NavMain({
                     ) : (
                         <a href={getFileUrl(item.url)} key={item.url}>
                             <Dropzone id={!item.url ? item.title : ''}>
-                                <SidebarMenuDisplay item={item} />
+                                <SidebarMenuButton tooltip={item.title}>
+                                    {item.icon && (
+                                        <DynamicIcon
+                                            name={
+                                                item.icon as LucideIconName
+                                            }
+                                        />
+                                    )}
+                                    <span className='truncate'>
+                                        {item.title}
+                                    </span>
+                                    {item.items && (
+                                        <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                                    )}
+                                </SidebarMenuButton>
                             </Dropzone>
                         </a>
                     );

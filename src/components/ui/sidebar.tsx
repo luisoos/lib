@@ -757,19 +757,6 @@ const SidebarMenuSubButton = React.forwardRef<
 });
 SidebarMenuSubButton.displayName = 'SidebarMenuSubButton';
 
-const SidebarMenuDisplay: React.FC<{ item: NavMainItem }> = ({ item }) => {
-    return (
-        <SidebarMenuButton tooltip={item.title}>
-            {item.icon && <DynamicIcon name={item.icon} />}
-            <span className='truncate'>{removeExtension(item.title)}</span>
-            {item.items && (
-                <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-            )}
-        </SidebarMenuButton>
-    );
-};
-SidebarMenuDisplay.displayName = 'SidebarMenuDisplay';
-
 export {
     Sidebar,
     SidebarContent,
@@ -785,7 +772,6 @@ export {
     SidebarMenuAction,
     SidebarMenuBadge,
     SidebarMenuButton,
-    SidebarMenuDisplay,
     SidebarMenuItem,
     SidebarMenuSkeleton,
     SidebarMenuSub,
