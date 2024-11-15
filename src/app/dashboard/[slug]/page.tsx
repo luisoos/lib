@@ -11,7 +11,7 @@ export default async function Page({
     if (!slug) return <div>Error: Bad request</div>;
 
     return (
-        <div className='px-4'>
+        <div className='px-4 h-full'>
             <h1>My Post: {slug}</h1>
             <RenderFile slug={slug} />
         </div>

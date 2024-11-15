@@ -26,15 +26,11 @@ const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
         fetchFile();
     }, [slug]);
 
-    return (
-        <div>
-            {fileData ? (
-                <View file={fileData!} fileType={fileType!} />
-            ) : (
-                'Loading file'
-            )}
-        </div>
-    );
+    if (fileData) {
+        return <View file={fileData!} fileType={fileType!} />;
+    } else {
+        <>Loading file</>;
+    }
 };
 
 export default RenderFile;

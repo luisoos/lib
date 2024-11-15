@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { DocumentView } from '~/components/ui/file/DocumentView';
 import ImageView from '~/components/ui/file/ImageView';
-import { PDFView } from '~/components/ui/file/PDFView';
+const PDFView = dynamic(() => import('~/components/ui/file/PDFView'), {
+    ssr: false,
+});
 
 const View: React.FC<{ file: string; fileType: string }> = ({
     file,
@@ -27,8 +30,6 @@ const View: React.FC<{ file: string; fileType: string }> = ({
         return <div>Loading file content...</div>;
     }
 
-    console.log(fileType);
-
     switch (fileType) {
         case 'text/plain':
             return <DocumentView content={fileContent} />;
@@ -44,8 +45,6 @@ const View: React.FC<{ file: string; fileType: string }> = ({
         default:
             return <>Filetype {fileType} is not supported.</>;
     }
-
-    return <div></div>;
 };
 
 export default View;

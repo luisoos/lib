@@ -56,7 +56,9 @@ export function NavMain({
                             <SidebarMenuItem>
                                 {/* <Dropzone id={!item.url ? item.title : ''}> */}
                                 <CollapsibleTrigger asChild>
-                                    <SidebarMenuButton tooltip={item.title}>
+                                    <SidebarMenuButton
+                                        tooltip={item.title}
+                                        className='text-black'>
                                         {item.icon && (
                                             <DynamicIcon
                                                 name={
@@ -96,7 +98,9 @@ export function NavMain({
                     ) : (
                         <Link href={getFileUrl(item.url)} key={item.url}>
                             <Dropzone id={!item.url ? item.title : ''}>
-                                <SidebarMenuButton tooltip={item.title}>
+                                <SidebarMenuButton
+                                    tooltip={item.title}
+                                    className='text-black'>
                                     {item.icon && (
                                         <DynamicIcon
                                             name={item.icon as LucideIconName}
