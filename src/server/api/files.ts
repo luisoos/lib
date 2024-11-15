@@ -4,6 +4,7 @@ import { env } from '~/env'; // Adjust import based on your environment setup
 import { getProfile } from './user';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { ExtendedFileObject } from '~/types/files/structure';
+import { db } from '~/server/db';
 
 // Define Zod schema for input validation
 const uploadFileSchema = z.object({
@@ -55,15 +56,20 @@ async function listFilesInFolder(supabase: SupabaseClient, path: string) {
 }
 
 export async function getFileById(fileId: string) {
+    // Get supabase client
     const supabase: SupabaseClient = createClient();
 
-    const pathResponse = await supabase
-        .from('storage.objects')
-        .select('path')
-        .eq('id', fileId)
-        .single();
+    // Get path by getting the storage object from the database
+    const pathResponse = await db.objects.findUnique({
+        where: {
+            id: fileId,
+        },
+        select: {
+            path_tokens: true,
+        },
+    });
 
-    if (pathResponse.error) {
+    if (!pathResponse || !pathResponse.path_tokens) {
         return {
             data: null,
             error: 'Could not find file or corresponding path',
@@ -71,9 +77,11 @@ export async function getFileById(fileId: string) {
         };
     }
 
+    const path = pathResponse.path_tokens.join('/');
+
     const { data, error } = await supabase.storage
         .from(env.SUPABASE_BUCKET_NAME)
-        .download(pathResponse.data.path);
+        .download(path);
 
     // TODO: Add user validation
     // const dbUser = await getProfile();
@@ -103,10 +111,15 @@ export async function uploadFile(body: any) {
     try {
         const { data, error } = await supabase.storage
             .from(env.SUPABASE_BUCKET_NAME)
-            .upload(`${userId}/${folder}${fileName}`, buffer, {
-                contentType: fileType,
-                upsert: true,
-            });
+            .upload(
+                `${userId}/${folder}${fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`,
+                buffer,
+                {
+                    contentType: fileType,
+                    upsert: true,
+                },
+            );
+        console.log(error);
         return { data, error };
     } catch (error) {
         console.log(error);

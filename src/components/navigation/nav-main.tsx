@@ -23,6 +23,7 @@ import getFileUrl from '~/hooks/files/getFileUrl';
 import { usePathname } from 'next/navigation';
 import { DynamicIcon, LucideIconName } from '~/hooks/icons';
 import { ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 
 export function NavMain({
     items,
@@ -45,7 +46,7 @@ export function NavMain({
             </div>
             <SidebarMenu>
                 {items.map((item) => {
-                    // item.isActive = pathname === getFileUrl(item.url);
+                    item.isActive = pathname === getFileUrl(item.url);
                     return !item.url ? (
                         <Collapsible
                             key={item.title + item.items?.length}
@@ -54,23 +55,23 @@ export function NavMain({
                             className='group/collapsible'>
                             <SidebarMenuItem>
                                 {/* <Dropzone id={!item.url ? item.title : ''}> */}
-                                    <CollapsibleTrigger asChild>
-                                        <SidebarMenuButton tooltip={item.title}>
-                                            {item.icon && (
-                                                <DynamicIcon
-                                                    name={
-                                                        item.icon as LucideIconName
-                                                    }
-                                                />
-                                            )}
-                                            <span className='truncate'>
-                                                {item.title}
-                                            </span>
-                                            {item.items && (
-                                                <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-                                            )}
-                                        </SidebarMenuButton>
-                                    </CollapsibleTrigger>
+                                <CollapsibleTrigger asChild>
+                                    <SidebarMenuButton tooltip={item.title}>
+                                        {item.icon && (
+                                            <DynamicIcon
+                                                name={
+                                                    item.icon as LucideIconName
+                                                }
+                                            />
+                                        )}
+                                        <span className='truncate'>
+                                            {item.title}
+                                        </span>
+                                        {item.items && (
+                                            <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                                        )}
+                                    </SidebarMenuButton>
+                                </CollapsibleTrigger>
                                 {/* </Dropzone> */}
                                 {item.items && (
                                     <CollapsibleContent>
@@ -93,14 +94,12 @@ export function NavMain({
                             </SidebarMenuItem>
                         </Collapsible>
                     ) : (
-                        <a href={getFileUrl(item.url)} key={item.url}>
+                        <Link href={getFileUrl(item.url)} key={item.url}>
                             <Dropzone id={!item.url ? item.title : ''}>
                                 <SidebarMenuButton tooltip={item.title}>
                                     {item.icon && (
                                         <DynamicIcon
-                                            name={
-                                                item.icon as LucideIconName
-                                            }
+                                            name={item.icon as LucideIconName}
                                         />
                                     )}
                                     <span className='truncate'>
@@ -111,7 +110,7 @@ export function NavMain({
                                     )}
                                 </SidebarMenuButton>
                             </Dropzone>
-                        </a>
+                        </Link>
                     );
                 })}
             </SidebarMenu>

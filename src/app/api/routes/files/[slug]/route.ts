@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { files } from '~/server/api/files';
 
-export async function GET(request: NextRequest, response: NextResponse) {
-    const searchParams = request.nextUrl.searchParams;
-    const slug = searchParams.get('slug');
+export async function GET(
+    request: NextRequest,
+    { params }: { params: { slug: string } },
+) {
+    const slug = params.slug;
     if (!slug)
         return NextResponse.json(
             { success: false, error: 'Bad request' },
@@ -17,7 +19,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
         );
 
     return NextResponse.json(
-        { success: true, data: file.data },
+        { success: true, data: await file.data!.text(), type: file.data!.type },
         { status: 200 },
     );
 }
