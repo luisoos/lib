@@ -4,6 +4,7 @@ import { GeistSans } from 'geist/font/sans';
 import { type Metadata } from 'next';
 
 import { env } from '~/env';
+import { Toaster } from '~/components/ui/toaster';
 
 export const metadata: Metadata = {
     title: env.NEXT_PUBLIC_PROJECT_NAME,
@@ -16,7 +17,10 @@ export default async function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang='en' className={`${GeistSans.variable}`}>
-            <body className='h-screen'>{children}</body>
+            <body className='h-screen'>
+                {children}
+                <Toaster />
+            </body>
         </html>
     );
 }

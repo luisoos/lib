@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Textarea } from '~/components/ui/textarea';
+import { Button } from '~/components/ui/button';
 
 interface CommentFormProps {
     onSubmit: (input: string) => void;
@@ -10,13 +12,13 @@ const CommentForm = ({ onSubmit, placeHolder }: CommentFormProps) => {
 
     return (
         <form
-            className='Tip__card'
+            className='py-1'
             onSubmit={(event) => {
                 event.preventDefault();
                 onSubmit(input);
             }}>
             <div>
-                <textarea
+                <Textarea
                     placeholder={placeHolder}
                     autoFocus
                     onChange={(event) => {
@@ -25,7 +27,9 @@ const CommentForm = ({ onSubmit, placeHolder }: CommentFormProps) => {
                 />
             </div>
             <div>
-                <input type='submit' value='Save' />
+                <Button variant='default' type='submit' className='mt-1'>
+                    Save
+                </Button>
             </div>
         </form>
     );

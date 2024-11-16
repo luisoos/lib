@@ -15,9 +15,10 @@ export async function POST(request: NextRequest, response: NextResponse) {
             return NextResponse.json({ success: false, data }, { status: 500 });
         } else {
             const url = request.nextUrl.clone();
-            url.pathname =
-                'dashboard/' +
-                getFileUrl(data!.data!.path.split('/').slice(1).join('/'));
+            url.pathname = getFileUrl(
+                data!.data!.path.split('/').slice(1).join('/'),
+                true,
+            );
             return NextResponse.redirect(url);
             // return NextResponse.json({ success: true, data });
         }

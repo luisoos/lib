@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Minus, Plus } from 'lucide-react';
+import { Highlighter, Minus, Plus } from 'lucide-react';
 import { cn } from '~/hooks/utils';
 
 interface ToolbarProps {
@@ -37,8 +37,8 @@ const Toolbar = ({ setPdfScaleValue, toggleHighlightPen }: ToolbarProps) => {
     };
 
     return (
-        <div className='border flex justify-between align-center px-4 py-2'>
-            <div className='flex align-center my-auto'>
+        <div className='flex justify-between align-middle px-4 py-2 border-b'>
+            <div className='flex align-middle my-auto'>
                 <button
                     title='Zoom in'
                     onClick={zoomIn}
@@ -63,7 +63,14 @@ const Toolbar = ({ setPdfScaleValue, toggleHighlightPen }: ToolbarProps) => {
                     toggleHighlightPen();
                     setIsHighlightPen(!isHighlightPen);
                 }}>
-                Toggle Highlights
+                <Highlighter
+                    className='rounded border p-0.5'
+                    style={{
+                        backgroundColor: isHighlightPen
+                            ? 'rgba(255, 226, 143, 1)'
+                            : 'transparent',
+                    }}
+                />
             </button>
         </div>
     );

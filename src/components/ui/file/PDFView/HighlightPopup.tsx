@@ -1,7 +1,6 @@
 import React from 'react';
 import type { ViewportHighlight } from 'react-pdf-highlighter-extended';
 
-import './style/HighlightPopup.css';
 import { CommentedHighlight } from '~/types/files/pdf';
 
 interface HighlightPopupProps {
@@ -9,10 +8,10 @@ interface HighlightPopupProps {
 }
 
 const HighlightPopup = ({ highlight }: HighlightPopupProps) => {
-    return highlight.comment ? (
-        <div className='Highlight__popup'>{highlight.comment}</div>
-    ) : (
-        <div className='Highlight__popup'>Comment has no Text</div>
+    return (
+        <div className='rounded border bg-white px-2 py-1'>
+            {highlight.comment ? highlight.comment : 'Comment has no Text'}
+        </div>
     );
 };
 

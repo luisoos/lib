@@ -14,9 +14,10 @@ const updateHash = (highlight: Highlight) => {
 
 const Sidebar = ({ highlights, resetHighlights }: SidebarProps) => {
     return (
-        <div className='sidebar w-full xl:w-1/6 xl:max-w-[500px]'>
+        <div className='sidebar w-full xl:w-1/6 xl:max-w-[500px] xl:mr-2'>
             {/* Description section */}
-            <div className='description py-4'>
+            <h2 className='text-xl font-medium'>Highlights</h2>
+            <div className='description mb-2'>
                 <p>
                     <small>
                         To create an area highlight hold ⌥ Option key (Alt),
@@ -34,13 +35,13 @@ const Sidebar = ({ highlights, resetHighlights }: SidebarProps) => {
                             onClick={() => {
                                 updateHash(highlight);
                             }}>
-                            <div>
+                            <div className='my-2 border rounded px-2 py-1 mr-1'>
                                 {/* Highlight comment and text */}
-                                <strong>{highlight.comment}</strong>
+                                <p className='font-medium'>
+                                    {highlight.comment}
+                                </p>
                                 {highlight.content.text && (
-                                    <blockquote
-                                        style={{ marginTop: '0.5rem' }}
-                                        className='p-0 quotes'>
+                                    <blockquote className='my-1 p-0.5 border-l border-zinc-400 pl-1.5 quotes'>
                                         {`${highlight.content.text.slice(0, 90).trim()}…`}
                                     </blockquote>
                                 )}
@@ -57,12 +58,12 @@ const Sidebar = ({ highlights, resetHighlights }: SidebarProps) => {
                                         />
                                     </div>
                                 )}
-                            </div>
 
-                            {/* Highlight page number */}
-                            <div className='text-right text-sm '>
-                                Page{' '}
-                                {highlight.position.boundingRect.pageNumber}
+                                {/* Highlight page number */}
+                                <div className='text-right opacity-80 text-sm'>
+                                    Page{' '}
+                                    {highlight.position.boundingRect.pageNumber}
+                                </div>
                             </div>
                         </li>
                     ))}

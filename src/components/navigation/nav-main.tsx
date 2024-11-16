@@ -37,6 +37,7 @@ export function NavMain({
     }[];
 }) {
     const pathname = usePathname();
+    const isDashboard = pathname === '/dashboard';
 
     return (
         <SidebarGroup>
@@ -96,7 +97,9 @@ export function NavMain({
                             </SidebarMenuItem>
                         </Collapsible>
                     ) : (
-                        <Link href={getFileUrl(item.url)} key={item.url}>
+                        <Link
+                            href={getFileUrl(item.url, isDashboard)}
+                            key={item.url}>
                             <Dropzone id={!item.url ? item.title : ''}>
                                 <SidebarMenuButton
                                     tooltip={item.title}

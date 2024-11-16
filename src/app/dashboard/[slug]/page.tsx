@@ -12,7 +12,6 @@ export default async function Page({
 
     return (
         <div className='px-4 h-full'>
-            <h1>My Post: {slug}</h1>
             <RenderFile slug={slug} />
         </div>
     );

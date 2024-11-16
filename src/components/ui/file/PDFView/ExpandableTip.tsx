@@ -5,7 +5,7 @@ import {
     PdfSelection,
     usePdfHighlighterContext,
 } from 'react-pdf-highlighter-extended';
-import './style/ExpandableTip.css';
+import { BookmarkPlus } from 'lucide-react';
 
 interface ExpandableTipProps {
     addHighlight: (highlight: GhostHighlight, comment: string) => void;
@@ -27,16 +27,17 @@ const ExpandableTip = ({ addHighlight }: ExpandableTipProps) => {
     }, [compact]);
 
     return (
-        <div className='Tip'>
+        <div className='border rounded bg-white shadow-inner px-2 py-1'>
             {compact ? (
                 <button
-                    className='Tip__compact'
+                    className='flex font-medium'
                     onClick={() => {
                         setCompact(false);
                         selectionRef.current = getCurrentSelection();
                         selectionRef.current!.makeGhostHighlight();
                     }}>
-                    Add highlight
+                    <BookmarkPlus size={16} className='my-auto mr-1' />
+                    <span>Add highlight</span>
                 </button>
             ) : (
                 <CommentForm

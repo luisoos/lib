@@ -117,15 +117,17 @@ const PDFView = ({ content }: { content: string }) => {
         const editCommentTip: Tip = {
             position: highlight.position,
             content: (
-                <CommentForm
-                    placeHolder={highlight.comment}
-                    onSubmit={(input) => {
-                        editHighlight(highlight.id, { comment: input });
-                        highlighterUtilsRef.current!.setTip(null);
-                        highlighterUtilsRef.current!.toggleEditInProgress(
-                            false,
-                        );
-                    }}></CommentForm>
+                <div className='border rounded bg-white shadow-inner px-2 py-1'>
+                    <CommentForm
+                        placeHolder={highlight.comment}
+                        onSubmit={(input) => {
+                            editHighlight(highlight.id, { comment: input });
+                            highlighterUtilsRef.current!.setTip(null);
+                            highlighterUtilsRef.current!.toggleEditInProgress(
+                                false,
+                            );
+                        }}></CommentForm>
+                </div>
             ),
         };
 
@@ -153,13 +155,13 @@ const PDFView = ({ content }: { content: string }) => {
 
     return (
         <div
-            className='App flex flex-col xl:flex-row overflow-hidden'
-            style={{ height: '97%' }}>
+            className='flex flex-col xl:flex-row xl:overflow-hidden'
+            style={{ height: '99%' }}>
             <Sidebar
                 highlights={highlights}
                 resetHighlights={resetHighlights}
             />
-            <div className='overflow-hidden relative flex-grow'>
+            <div className='max-xl:min-h-screen xl:overflow-hidden relative flex-grow border'>
                 <Toolbar
                     setPdfScaleValue={(value) => setPdfScaleValue(value)}
                     toggleHighlightPen={() => setHighlightPen(!highlightPen)}
@@ -203,6 +205,7 @@ const PDFView = ({ content }: { content: string }) => {
                             highlights={highlights || []}
                             style={{
                                 height: 'calc(100% - 41px)',
+                                background: '#fff',
                             }}>
                             <HighlightContainer
                                 editHighlight={editHighlight}
