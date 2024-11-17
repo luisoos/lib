@@ -42,7 +42,11 @@ export function AppSidebar({
                 ) : (
                     'Start by uploading a file or creating a file.'
                 )}
-                <Dropzone id={''} className='h-full max-h-96' />
+                <Dropzone id={''} className='h-full max-h-96'>
+                    <FileTreeContextMenu id={''}>
+                        <div className='h-full w-full -translate-y-4'></div>
+                    </FileTreeContextMenu>
+                </Dropzone>
                 {/* <NavProjects projects={projects} /> */}
                 {/* </FileTreeContextMenu> */}
             </SidebarContent>

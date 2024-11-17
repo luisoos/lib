@@ -21,7 +21,7 @@ const RecursiveMenuItem: React.FC<{ item: NavMainItem; path: string }> = ({
     return (
         <FileTreeContextMenu id={id}>
             <SidebarMenuSubItem key={item.title}>
-                <Dropzone id={item.items ? id : path}>
+                <FileTreeContextMenu id={item.items ? id : path}>
                     <SidebarMenuSubButton asChild>
                         <a
                             id={item.items ? id : path}
@@ -30,7 +30,7 @@ const RecursiveMenuItem: React.FC<{ item: NavMainItem; path: string }> = ({
                             <span>{removeExtension(item.title)}</span>
                         </a>
                     </SidebarMenuSubButton>
-                </Dropzone>
+                </FileTreeContextMenu>
                 {item.items && item.items.length > 0 && (
                     <SidebarMenuSub>
                         {item.items.map((subItem) => (

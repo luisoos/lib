@@ -71,8 +71,8 @@ export async function POST(request: NextRequest) {
                 data!.data!.path.split('/').slice(1).join('/'),
                 true,
             );
-            return NextResponse.redirect(url); // Redirect to the uploaded file's URL
-            // return NextResponse.json({ success: true, data });
+            // return NextResponse.redirect(url); // Redirect to the uploaded file's URL
+            return NextResponse.json({ success: true, data });
         }
     } catch (error) {
         console.error('Error uploading file:', error);

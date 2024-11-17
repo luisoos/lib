@@ -34,18 +34,17 @@ const Dropzone: React.FC<ControlComponentProps> = ({
     }, [file]);
 
     return (
-        <Comp id={id} data-dropzone='true'>
-            <div
-                {...getRootProps()}
-                className={cn(
-                    'dropzone',
-                    isDragActive ? 'opacity-60 transition-all delay-75' : '',
-                    className,
-                )}>
-                <input {...getInputProps()} />
-                {children}
-            </div>
-        </Comp>
+        <div
+            data-dropzone='true'
+            {...getRootProps()}
+            className={cn(
+                'dropzone',
+                isDragActive ? 'opacity-60 transition-all delay-75' : '',
+                className,
+            )}>
+            <input {...getInputProps()} />
+            {children}
+        </div>
     );
 };
 

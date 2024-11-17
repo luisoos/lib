@@ -24,6 +24,7 @@ import { usePathname } from 'next/navigation';
 import { DynamicIcon, LucideIconName } from '~/hooks/icons';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import FileTreeContextMenu from '../controls/FileTreeContextMenu';
 
 export function NavMain({
     items,
@@ -55,27 +56,27 @@ export function NavMain({
                             defaultOpen={item.isActive}
                             className='group/collapsible'>
                             <SidebarMenuItem>
-                                {/* <Dropzone id={!item.url ? item.title : ''}> */}
                                 <CollapsibleTrigger asChild>
-                                    <SidebarMenuButton
-                                        tooltip={item.title}
-                                        className='text-black'>
-                                        {item.icon && (
-                                            <DynamicIcon
-                                                name={
-                                                    item.icon as LucideIconName
-                                                }
-                                            />
-                                        )}
-                                        <span className='truncate'>
-                                            {item.title}
-                                        </span>
-                                        {item.items && (
-                                            <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-                                        )}
-                                    </SidebarMenuButton>
+                                    <FileTreeContextMenu id={item.title}>
+                                        <SidebarMenuButton
+                                            tooltip={item.title}
+                                            className='text-black'>
+                                            {item.icon && (
+                                                <DynamicIcon
+                                                    name={
+                                                        item.icon as LucideIconName
+                                                    }
+                                                />
+                                            )}
+                                            <span className='truncate'>
+                                                {item.title}
+                                            </span>
+                                            {item.items && (
+                                                <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                                            )}
+                                        </SidebarMenuButton>
+                                    </FileTreeContextMenu>
                                 </CollapsibleTrigger>
-                                {/* </Dropzone> */}
                                 {item.items && (
                                     <CollapsibleContent>
                                         <SidebarMenuSub>
@@ -100,7 +101,7 @@ export function NavMain({
                         <Link
                             href={getFileUrl(item.url, isDashboard)}
                             key={item.url}>
-                            <Dropzone id={!item.url ? item.title : ''}>
+                            <FileTreeContextMenu id={item.title ?? item.url}>
                                 <SidebarMenuButton
                                     tooltip={item.title}
                                     className='text-black'>
@@ -116,7 +117,7 @@ export function NavMain({
                                         <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
                                     )}
                                 </SidebarMenuButton>
-                            </Dropzone>
+                            </FileTreeContextMenu>
                         </Link>
                     );
                 })}
