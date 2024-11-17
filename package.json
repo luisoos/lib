@@ -76,6 +76,11 @@
         "initVersion": "7.37.0"
     },
     "packageManager": "yarn@1.22.19",
+    "overrides": {
+        "react-pdf-highlighter-extended": {
+            "pdfjs-dist": "4.4.168"
+        }
+    },
     "resolutions": {
         "pdfjs-dist": "4.4.168"
     }

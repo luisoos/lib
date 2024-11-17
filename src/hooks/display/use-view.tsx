@@ -8,9 +8,10 @@ const PDFView = dynamic(() => import('~/components/ui/file/PDFView'), {
     ssr: false,
 });
 
-const View: React.FC<{ file: string; fileType: string }> = ({
+const View: React.FC<{ file: string; fileType: string; fileId: string }> = ({
     file,
     fileType,
+    fileId,
 }) => {
     const [fileContent, setFileContent] = useState<string | null>(null);
 
@@ -41,7 +42,7 @@ const View: React.FC<{ file: string; fileType: string }> = ({
         case 'image/tiff':
             return <ImageView content={fileContent} />;
         case 'application/pdf':
-            return <PDFView content={fileContent} />;
+            return <PDFView fileId={fileId} pdfUrl={file} />;
         default:
             return <>Filetype {fileType} is not supported.</>;
     }

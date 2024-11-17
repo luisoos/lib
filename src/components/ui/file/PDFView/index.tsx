@@ -18,6 +18,7 @@ import {
     ViewportHighlight,
 } from 'react-pdf-highlighter-extended';
 import { CommentedHighlight } from '~/types/files/pdf';
+import { useToast } from '~/hooks/use-toast';
 
 const getNextId = () => String(Math.random()).slice(2);
 
@@ -29,9 +30,9 @@ const resetHash = () => {
     document.location.hash = '';
 };
 
-const PDFView = ({ content }: { content: string }) => {
-    const [url, setUrl] = useState('https://arxiv.org/pdf/2203.11115');
+const PDFView = ({ fileId, pdfUrl }: { fileId: string; pdfUrl: string }) => {
     const [highlights, setHighlights] = useState<Array<CommentedHighlight>>();
+    const [highlightsLoading, setHighlightsLoading] = useState<boolean>(true);
     const currentPdfIndexRef = useRef(0);
     const [contextMenu, setContextMenu] = useState<ContextMenuProps | null>(
         null,
@@ -40,9 +41,40 @@ const PDFView = ({ content }: { content: string }) => {
         undefined,
     );
     const [highlightPen, setHighlightPen] = useState<boolean>(false);
+    const { toast } = useToast();
 
     // Refs for PdfHighlighter utilities
     const highlighterUtilsRef = useRef<PdfHighlighterUtils>();
+
+    // Set Highlights on mount
+    useEffect(() => {
+        // Function to fetch data or perform actions on load
+        const fetchData = async () => {
+            try {
+                const response = await fetch(
+                    `/api/routes/highlights?fileId=${fileId}`,
+                ); // Replace with your API endpoint
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log(result);
+                    setHighlights(result.highlights); // Set the fetched data
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Failed to retrieve highlights.',
+                        description:
+                            'We had an getting your highlights for this document. Try again.',
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setHighlightsLoading(false); // Set loading to false after fetching
+            }
+        };
+
+        fetchData(); // Call the function on component mount
+    }, []); // Empty dependency array means this runs once on mount
 
     // Click listeners for context menu
     useEffect(() => {
@@ -73,33 +105,104 @@ const PDFView = ({ content }: { content: string }) => {
         });
     };
 
-    const addHighlight = (highlight: GhostHighlight, comment: string) => {
+    const addHighlight = async (highlight: GhostHighlight, comment: string) => {
         console.log('Saving highlight', highlight);
-        setHighlights([
-            { ...highlight, comment, id: getNextId() },
-            ...(highlights || []),
-        ]);
+        try {
+            const response = await fetch(`/api/routes/highlights`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ highlight, fileId, comment }),
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setHighlights([
+                    { ...highlight, comment, id: data.highlight.id },
+                    ...(highlights || []),
+                ]);
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Failed to save highlight.',
+                    description:
+                        'We had an error saving your highlight. Try again.',
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
 
-    const deleteHighlight = (highlight: ViewportHighlight | Highlight) => {
-        console.log('Deleting highlight', highlight);
-        setHighlights(
-            highlights ? highlights.filter((h) => h.id != highlight.id) : [],
-        );
+    const deleteHighlight = async (
+        highlight: ViewportHighlight | Highlight,
+    ) => {
+        try {
+            console.log('Deleting highlight', highlight);
+            const response = await fetch(
+                `/api/routes/highlights?id=${highlight.id}`,
+                {
+                    method: 'DELETE',
+                },
+            );
+            if (response.ok) {
+                setHighlights(
+                    highlights
+                        ? highlights.filter((h) => h.id != highlight.id)
+                        : [],
+                );
+                toast({
+                    description: 'Successfully deleted the highlight.',
+                });
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Failed to delete highlight.',
+                    description:
+                        'We had an error deleting your highlight. Try again.',
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
 
-    const editHighlight = (
+    const editHighlight = async (
         idToUpdate: string,
         edit: Partial<CommentedHighlight>,
     ) => {
-        console.log(`Editing highlight ${idToUpdate} with `, edit);
-        setHighlights(
-            highlights?.map((highlight) =>
-                highlight.id === idToUpdate
-                    ? { ...highlight, ...edit }
-                    : highlight,
-            ),
-        );
+        if (!edit.comment) return;
+        try {
+            console.log(`Editing highlight ${idToUpdate} with `, edit);
+            const response = await fetch(
+                `/api/routes/highlights?id=${idToUpdate}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ description: edit.comment }),
+                },
+            );
+            if (response.ok) {
+                setHighlights(
+                    highlights?.map((highlight) =>
+                        highlight.id === idToUpdate
+                            ? { ...highlight, ...edit }
+                            : highlight,
+                    ),
+                );
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Failed to edit highlight.',
+                    description:
+                        'We had an error saving your revised highlight comment. Try again.',
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
 
     const resetHighlights = () => {
@@ -155,18 +258,22 @@ const PDFView = ({ content }: { content: string }) => {
 
     return (
         <div
-            className='flex flex-col xl:flex-row xl:overflow-hidden'
+            className='flex flex-col-reverse xl:flex-row xl:overflow-hidden'
             style={{ height: '99%' }}>
-            <Sidebar
-                highlights={highlights}
-                resetHighlights={resetHighlights}
-            />
-            <div className='max-xl:min-h-screen xl:overflow-hidden relative flex-grow border'>
+            {highlightsLoading ? (
+                <p>Loading highlights...</p>
+            ) : (
+                <Sidebar
+                    highlights={highlights}
+                    resetHighlights={resetHighlights}
+                />
+            )}
+            <div className='max-xl:min-h-[700px] xl:overflow-hidden relative flex-grow border'>
                 <Toolbar
                     setPdfScaleValue={(value) => setPdfScaleValue(value)}
                     toggleHighlightPen={() => setHighlightPen(!highlightPen)}
                 />
-                <PdfLoader document={url}>
+                <PdfLoader document={pdfUrl}>
                     {(pdfDocument: any) => (
                         <PdfHighlighter
                             enableAreaSelection={(event: { altKey: any }) =>
@@ -202,7 +309,9 @@ const PDFView = ({ content }: { content: string }) => {
                                     />
                                 )
                             }
-                            highlights={highlights || []}
+                            highlights={
+                                (highlightsLoading ? [] : highlights) || []
+                            }
                             style={{
                                 height: 'calc(100% - 41px)',
                                 background: '#fff',

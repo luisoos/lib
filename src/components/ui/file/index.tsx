@@ -16,8 +16,9 @@ const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
             const response = await fetch(`/api/routes/files/${slug}`);
             if (response.ok) {
                 const data = await response.json();
-                setFileData(data.data);
-                setFileType(data.type);
+                console.log(data);
+                setFileData(data.data.signedUrl);
+                setFileType(data.data.mimetype);
             } else {
                 console.error('Failed to fetch file');
             }
@@ -27,7 +28,7 @@ const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
     }, [slug]);
 
     if (fileData) {
-        return <View file={fileData!} fileType={fileType!} />;
+        return <View fileId={slug} file={fileData!} fileType={fileType!} />;
     } else {
         <>Loading file</>;
     }

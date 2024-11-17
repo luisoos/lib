@@ -14,7 +14,7 @@ const updateHash = (highlight: Highlight) => {
 
 const Sidebar = ({ highlights, resetHighlights }: SidebarProps) => {
     return (
-        <div className='sidebar w-full xl:w-1/6 xl:max-w-[500px] xl:mr-2'>
+        <div className='sidebar w-full max-xl:mt-2 xl:w-1/6 xl:max-w-[500px] xl:mr-2'>
             {/* Description section */}
             <h2 className='text-xl font-medium'>Highlights</h2>
             <div className='description mb-2'>
@@ -27,7 +27,7 @@ const Sidebar = ({ highlights, resetHighlights }: SidebarProps) => {
             </div>
 
             {/* Highlights list */}
-            {highlights && (
+            {highlights && highlights.length > 0 && (
                 <ul className='h-max list-none p-0 cursor-pointer hover:opacity-80'>
                     {highlights.map((highlight, index) => (
                         <li

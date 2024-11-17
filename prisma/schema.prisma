@@ -14,7 +14,7 @@ datasource db {
     // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url         = env("DATABASE_URL")
     directUrl   = env("DIRECT_URL")
-    schemas  = ["public", "storage"]
+    schemas  = ["public"]
 }
 
 model Post {
@@ -83,17 +83,13 @@ model VerificationToken {
     @@schema("public")
 }
 
+// Define the Highlight model with a relationship
+model Highlight {
+    id                Int      @id @default(autoincrement()) // Unique identifier for highlight
+    title             String   // Title of the highlight
+    description       String?  // Optional description of the highlight
+    data              Json
+    storageObjectId   String      // Foreign key referencing objects.id
 
-model objects {
-    id           String   @id @default(uuid()) @db.Uuid // Unique identifier
-    name         String   // Name of the file
-    bucket_id    String   // ID of the bucket
-    owner        String?  // Owner of the object (if applicable)
-    created_at   DateTime @default(now()) // Timestamp when created
-    updated_at   DateTime @updatedAt // Timestamp when updated
-    size         Int      // Size of the object in bytes
-    mime_type    String?  // MIME type of the object
-    path_tokens  String[]   // Path to the object in storage
-
-    @@schema("storage") // Specify that this model belongs to the storage schema
+    @@schema("public")
 }
