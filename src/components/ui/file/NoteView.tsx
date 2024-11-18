@@ -13,6 +13,8 @@ import { cn } from '~/hooks/utils';
 import useDebounce from '~/hooks/use-debounce';
 import removeExtension from '~/hooks/files/removeExtension';
 
+const proseClasses = 'prose prose-sm sm:prose lg:prose-md prose-neutral';
+
 export default ({
     fileId,
     fileName,
@@ -31,7 +33,10 @@ export default ({
         content: editorContent,
         editorProps: {
             attributes: {
-                class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl prose-zinc mx-auto focus:outline-none focus-visible:outline-none',
+                class: cn(
+                    proseClasses,
+                    'mx-auto focus:outline-none focus-visible:outline-none',
+                ),
                 style: 'height: 90vh;',
             },
         },
@@ -94,12 +99,14 @@ export default ({
 
     return (
         <>
-            <input
-                className='text-xl font-medium rounded focus:outline-none focus-visible:outline-none focus-visible:opacity-80 transition-all delay-75'
-                type='text'
-                value={title}
-                onChange={handleTitleChange}
-            />
+            <div className={cn(proseClasses, 'mx-auto')}>
+                <input
+                    className='text-xl font-medium rounded focus:outline-none focus-visible:outline-none focus-visible:opacity-80 transition-all delay-75'
+                    type='text'
+                    value={title}
+                    onChange={handleTitleChange}
+                />
+            </div>
             {editor && (
                 <BubbleMenu
                     className='divide-x rounded border shadow-inner bg-white'

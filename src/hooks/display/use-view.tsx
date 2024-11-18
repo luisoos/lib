@@ -33,30 +33,24 @@ const View: React.FC<{
         return <div>Loading file content...</div>;
     }
 
-    switch (fileType) {
-        case 'text/plain':
-            return (
-                <NoteView
-                    fileId={fileId}
-                    fileName={fileName ?? ''}
-                    content={fileContent}
-                />
-            );
-        case 'image/jpg':
-        case 'image/jpeg':
-        case 'image/png':
-        case 'image/gif':
-        case 'image/bmp':
-        case 'image/tiff':
-            return <ImageView content={fileContent} />;
-        case 'application/pdf':
-            return <PDFView fileId={fileId} pdfUrl={file} />;
-        default:
-            return (
-                <div className='flex item-middle justify-center'>
-                    Filetype {fileType} is not supported.
-                </div>
-            );
+    if (fileType.startsWith('text/plain')) {
+        return (
+            <NoteView
+                fileId={fileId}
+                fileName={fileName ?? ''}
+                content={fileContent}
+            />
+        );
+    } else if (fileType.startsWith('image/')) {
+        return <ImageView content={fileContent} />;
+    } else if (fileType.startsWith('application/pdf')) {
+        return <PDFView fileId={fileId} pdfUrl={file} />;
+    } else {
+        return (
+            <div className='flex item-middle justify-center'>
+                Filetype {fileType} is not supported.
+            </div>
+        );
     }
 };
 

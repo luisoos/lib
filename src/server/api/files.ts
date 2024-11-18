@@ -101,7 +101,7 @@ export async function getFileById(fileId: string) {
             status: 500,
         };
 
-    if ((objectData.metadata as Metadata).mimetype === 'text/plain') {
+    if ((objectData.metadata as Metadata).mimetype.startsWith('text/plain')) {
         const { data: fileContent, error: storageError } =
             await supabase.storage
                 .from(env.SUPABASE_BUCKET_NAME)
@@ -192,14 +192,14 @@ export async function updateNote(
     if (!user) return { data: null, error: 'Unauthorized', status: 401 };
     const userId = user.id;
 
-    let buffer: Buffer | undefined;
+    let content: string | undefined;
     const folder: string[] = await getPathTokens(supabase, fileId);
     const fileNameNotChanged = folder[folder.length - 1] === fileName;
 
     if (fileData) {
         // `fileData` is set; there is a change in the note body
         // Decode the base64 file data
-        buffer = Buffer.from(fileData, 'base64');
+        content = Buffer.from(fileData, 'base64').toString();
     } else if (fileNameNotChanged) {
         // `fileData` is not set and the name of the note was not changed (Nothing to update)
         return {
@@ -216,7 +216,7 @@ export async function updateNote(
         const oldFile = await getFileById(fileId);
         // Only `fileName` was submitted, thus only the name should be changed;
         // we know this, because `buffer` must be set otherwise
-        if (!buffer) {
+        if (!content) {
             // Error handling in case the old file could not be found
             if (!oldFile.data || oldFile.error || 'signedUrl' in oldFile.data)
                 return {
@@ -225,7 +225,7 @@ export async function updateNote(
                     status: 400,
                 };
             // Decode the base64 file data
-            buffer = Buffer.from(oldFile.data.fileContent, 'base64');
+            content = oldFile.data.fileContent;
         }
     }
     // TODO add validation
@@ -239,7 +239,7 @@ export async function updateNote(
     // Because either the filename or the body has to be set, this is just to
     // make sure we don't get a type error when uploading the file to Supabase
     // Storage
-    if (!buffer)
+    if (!content)
         return {
             data: null,
             error: 'Internal error while preparing Supabase transaction.',
@@ -249,8 +249,8 @@ export async function updateNote(
     try {
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from(env.SUPABASE_BUCKET_NAME)
-            .upload(newPath, buffer, {
-                upsert: false,
+            .upload(newPath, content, {
+                upsert: true,
             });
         console.log(uploadError);
 
@@ -259,9 +259,7 @@ export async function updateNote(
             const { data: removeData, error: removeError } =
                 await supabase.storage
                     .from(env.SUPABASE_BUCKET_NAME)
-                    .upload(newPath, buffer, {
-                        upsert: false,
-                    });
+                    .remove([newPath]);
             console.log(removeError);
         }
         return {
