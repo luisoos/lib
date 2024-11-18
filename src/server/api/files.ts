@@ -1,19 +1,12 @@
 import { z } from 'zod';
 import { createClient } from '~/utils/supabase/server'; // Adjust import based on your setup
 import { env } from '~/env'; // Adjust import based on your environment setup
-import { getProfile } from './user';
+import { getProfile } from '~/server/api/user';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { ExtendedFileObject } from '~/types/files/structure';
 import { db } from '~/server/db';
 import { validateFileOwnership } from './shared/validateFileOwnership';
-
-// Define Zod schema for input validation
-const uploadFileSchema = z.object({
-    fileName: z.string(),
-    fileType: z.string(),
-    fileData: z.string(), // Base64 encoded file data
-    folderName: z.string().optional(),
-});
+import { FileContentOrSignedUrl, Metadata } from '~/types/files/db';
 
 export async function getStructure() {
     // Get supabase client
@@ -91,69 +84,72 @@ export async function getFileById(fileId: string) {
     const path = pathResponse.join('/');
 
     // Define types for the response
-    let error: typeof storageError | typeof metadataError | null = null;
-    let data: { signedUrl: string; metadata: typeof metadata } | null = null;
-
-    // Create a signed URL for the file that is valid for one minute
-    const { data: signedUrl, error: storageError } = await supabase.storage
-        .from(env.SUPABASE_BUCKET_NAME)
-        .createSignedUrl(path, 60);
-
-    if (!signedUrl || !signedUrl.signedUrl || storageError)
-        return {
-            data: null,
-            error: storageError,
-            status: 500,
-        };
+    let error: any | typeof metadataError | null = null;
+    let data: FileContentOrSignedUrl = null;
 
     // Retrieve the metadata of the file
-    const { data: metadata, error: metadataError } = await supabase
+    const { data: objectData, error: metadataError } = await supabase
         .from('objects')
-        .select('metadata')
+        .select('metadata, path_tokens')
         .eq('id', fileId)
         .single();
 
-    if (!metadata || !metadata.metadata || metadataError)
+    if (!objectData || !objectData.metadata || metadataError)
         return {
             data: null,
             error: metadataError,
             status: 500,
         };
 
-    data = {
-        signedUrl: signedUrl.signedUrl,
-        ...metadata.metadata,
-    };
+    if ((objectData.metadata as Metadata).mimetype === 'text/plain') {
+        const { data: fileContent, error: storageError } =
+            await supabase.storage
+                .from(env.SUPABASE_BUCKET_NAME)
+                .download(path);
+
+        if (!fileContent || storageError)
+            return {
+                data: null,
+                error: 'Error downloading file.',
+                status: 500,
+            };
+
+        data = {
+            fileContent: await fileContent?.text(),
+            fileName: objectData.path_tokens[objectData.path_tokens.length - 1],
+            ...objectData.metadata,
+        };
+    } else {
+        // Create a signed URL for the file that is valid for one minute
+        const { data: signedUrl, error: storageError } = await supabase.storage
+            .from(env.SUPABASE_BUCKET_NAME)
+            .createSignedUrl(path, 60);
+
+        if (!signedUrl || !signedUrl.signedUrl || storageError)
+            return {
+                data: null,
+                error: storageError,
+                status: 500,
+            };
+
+        data = {
+            signedUrl: signedUrl.signedUrl,
+            ...objectData.metadata,
+        };
+    }
 
     return { data, error };
 }
 
-async function getPathTokens(
-    supabase: SupabaseClient<any, string, any>,
-    fileId: string,
-) {
-    const { data, error } = await supabase
-        .from('objects') // Specify the table name
-        .select('path_tokens') // Select only the path_tokens field
-        .eq('id', fileId) // Filter by id
-        .single(); // Expect a single record
-
-    if (error) {
-        console.error('Error fetching path tokens:', error);
-        throw new Error('Failed to fetch path tokens');
-    }
-
-    return data?.path_tokens; // Return only the path_tokens field or undefined if not found
-}
-
 // Function to upload a file
-export async function uploadFile(body: any) {
-    // Validate input using Zod
-    const parsedInput = uploadFileSchema.parse(body);
-
+export async function uploadFile(
+    fileName: string,
+    fileType: string,
+    fileData: string,
+    folderName: string | undefined,
+) {
     // Get supabase client and parameters
     const supabase = createClient();
-    const { fileName, fileType, fileData, folderName } = parsedInput;
     // Fetch authenticated user
     const user = await getProfile();
     if (!user) return null;
@@ -183,4 +179,116 @@ export async function uploadFile(body: any) {
     }
 }
 
-export const files = { getStructure, getFileById, uploadFile };
+// Function to update a file
+export async function updateNote(
+    fileName: string,
+    fileId: string,
+    fileData: string | undefined,
+) {
+    // Get supabase client and parameters
+    const supabase = createClient('storage');
+    // Fetch authenticated user
+    const user = await getProfile();
+    if (!user) return { data: null, error: 'Unauthorized', status: 401 };
+    const userId = user.id;
+
+    let buffer: Buffer | undefined;
+    const folder: string[] = await getPathTokens(supabase, fileId);
+    const fileNameNotChanged = folder[folder.length - 1] === fileName;
+
+    if (fileData) {
+        // `fileData` is set; there is a change in the note body
+        // Decode the base64 file data
+        buffer = Buffer.from(fileData, 'base64');
+    } else if (fileNameNotChanged) {
+        // `fileData` is not set and the name of the note was not changed (Nothing to update)
+        return {
+            data: null,
+            error: '`fileData` is undefined and the `fileName` is the same.',
+            status: 400,
+        };
+    }
+
+    console.log(folder, fileNameNotChanged, fileName, fileData);
+
+    // Name of the note was changed
+    if (!fileNameNotChanged) {
+        const oldFile = await getFileById(fileId);
+        // Only `fileName` was submitted, thus only the name should be changed;
+        // we know this, because `buffer` must be set otherwise
+        if (!buffer) {
+            // Error handling in case the old file could not be found
+            if (!oldFile.data || oldFile.error || 'signedUrl' in oldFile.data)
+                return {
+                    data: null,
+                    error: 'File should only be renamed but could not be retrieved.',
+                    status: 400,
+                };
+            // Decode the base64 file data
+            buffer = Buffer.from(oldFile.data.fileContent, 'base64');
+        }
+    }
+    // TODO add validation
+
+    // Set new filename & path
+    folder[folder.length - 1] = fileName
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    const newPath: string = folder.join('/');
+
+    // Because either the filename or the body has to be set, this is just to
+    // make sure we don't get a type error when uploading the file to Supabase
+    // Storage
+    if (!buffer)
+        return {
+            data: null,
+            error: 'Internal error while preparing Supabase transaction.',
+            status: 500,
+        };
+
+    try {
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from(env.SUPABASE_BUCKET_NAME)
+            .upload(newPath, buffer, {
+                upsert: false,
+            });
+        console.log(uploadError);
+
+        let removeError;
+        if (!fileNameNotChanged) {
+            const { data: removeData, error: removeError } =
+                await supabase.storage
+                    .from(env.SUPABASE_BUCKET_NAME)
+                    .upload(newPath, buffer, {
+                        upsert: false,
+                    });
+            console.log(removeError);
+        }
+        return {
+            data: uploadData,
+            error: uploadError,
+            status: !fileNameNotChanged && !removeError ? 301 : 200,
+        };
+    } catch (error: any) {
+        console.log(error);
+        return { data: null, error: error, status: error.status ?? 500 };
+    }
+}
+
+async function getPathTokens(
+    supabase: SupabaseClient<any, string, any>,
+    fileId: string,
+) {
+    const { data, error } = await supabase
+        .from('objects') // Specify the table name
+        .select('path_tokens') // Select only the path_tokens field
+        .eq('id', fileId) // Filter by id
+        .single(); // Expect a single record
+
+    if (error) {
+        console.error('Error fetching path tokens:', error);
+        throw new Error('Failed to fetch path tokens');
+    }
+
+    return data?.path_tokens; // Return only the path_tokens field or undefined if not found
+}

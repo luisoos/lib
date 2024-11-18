@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { files } from '~/server/api/files';
+import { z } from 'zod';
+import { getFileById, updateNote } from '~/server/api/files';
+
+const updateFileSchema = z.object({
+    fileName: z.string(), // Make fileName optional
+    fileData: z.string().optional(), // Make fileData optional
+});
 
 /**
  * API Endpoint to retrieve a file by its slug
@@ -41,7 +47,7 @@ export async function GET(
             { status: 400 },
         );
 
-    const file = await files.getFileById(slug);
+    const file = await getFileById(slug);
     if (file.error)
         return NextResponse.json(
             { success: false, error: file.error },
@@ -52,4 +58,72 @@ export async function GET(
         { success: true, data: await file.data },
         { status: 200 },
     );
+}
+
+/**
+ * API Endpoint to update a file by its ID
+ *
+ * This function handles PUT requests to update a specific file identified by its ID.
+ *
+ * @async
+ * @function PUT
+ * @param {NextRequest} request - The incoming request object containing the request details.
+ * @returns {Promise<NextResponse>} A promise that resolves to a NextResponse object indicating success or failure.
+ */
+export async function PUT(
+    request: NextRequest,
+    { params }: { params: { slug: string } },
+) {
+    try {
+        const slug = params.slug;
+        if (!slug)
+            return NextResponse.json(
+                { success: false, error: 'Bad request' },
+                { status: 400 },
+            );
+
+        const body = await request.json(); // Parse the JSON body of the request
+
+        // Validate the incoming data against the schema
+        const parsedData = updateFileSchema.parse(body);
+        const fileName = !parsedData.fileName.endsWith('.txt')
+            ? parsedData.fileName + '.txt'
+            : parsedData.fileName;
+
+        const data = await updateNote(fileName, slug, parsedData.fileData);
+
+        if (!data || data.error) {
+            console.error(
+                'Error updating file:',
+                data.error || data.error.message,
+            );
+            return NextResponse.json(
+                { success: false, error: data.error.message },
+                { status: 500 }, // Internal Server Error
+            );
+        }
+
+        return NextResponse.json(
+            { success: true, data },
+            { status: 200 }, // OK status
+        );
+    } catch (error) {
+        console.error('Error updating file:', error);
+
+        if (error instanceof z.ZodError) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: 'Validation failed',
+                    issues: error.errors,
+                },
+                { status: 400 }, // Bad Request status
+            );
+        }
+
+        return NextResponse.json(
+            { success: false, error: 'Failed to update file' },
+            { status: 500 }, // Internal Server Error
+        );
+    }
 }

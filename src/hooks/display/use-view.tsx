@@ -4,15 +4,17 @@ import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { DocumentView } from '~/components/ui/file/DocumentView';
 import ImageView from '~/components/ui/file/ImageView';
+import NoteView from '~/components/ui/file/NoteView';
 const PDFView = dynamic(() => import('~/components/ui/file/PDFView'), {
     ssr: false,
 });
 
-const View: React.FC<{ file: string; fileType: string; fileId: string }> = ({
-    file,
-    fileType,
-    fileId,
-}) => {
+const View: React.FC<{
+    fileId: string;
+    file: string;
+    fileType: string;
+    fileName?: string;
+}> = ({ file, fileType, fileName, fileId }) => {
     const [fileContent, setFileContent] = useState<string | null>(null);
 
     useEffect(() => {
@@ -33,7 +35,13 @@ const View: React.FC<{ file: string; fileType: string; fileId: string }> = ({
 
     switch (fileType) {
         case 'text/plain':
-            return <DocumentView content={fileContent} />;
+            return (
+                <NoteView
+                    fileId={fileId}
+                    fileName={fileName ?? ''}
+                    content={fileContent}
+                />
+            );
         case 'image/jpg':
         case 'image/jpeg':
         case 'image/png':
@@ -44,7 +52,11 @@ const View: React.FC<{ file: string; fileType: string; fileId: string }> = ({
         case 'application/pdf':
             return <PDFView fileId={fileId} pdfUrl={file} />;
         default:
-            return <>Filetype {fileType} is not supported.</>;
+            return (
+                <div className='flex item-middle justify-center'>
+                    Filetype {fileType} is not supported.
+                </div>
+            );
     }
 };
 

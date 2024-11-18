@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import getFileUrl from '~/hooks/files/getFileUrl';
 import { getStructure, uploadFile } from '~/server/api/files';
+
+const uploadFileSchema = z.object({
+    fileName: z.string(),
+    fileType: z.string(),
+    fileData: z.string(),
+    folderName: z.string().optional(),
+});
 
 /**
  * API Endpoint to retrieve the file structure
@@ -61,7 +69,13 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json(); // Parse the JSON body of the request
-        const data = await uploadFile(body); // Upload the file using provided data
+        const parsedData = uploadFileSchema.parse(body);
+        const data = await uploadFile(
+            parsedData.fileName,
+            parsedData.fileType,
+            parsedData.fileData,
+            parsedData.folderName,
+        ); // Upload the file using provided data
 
         if (data?.error) {
             return NextResponse.json({ success: false, data }, { status: 500 });

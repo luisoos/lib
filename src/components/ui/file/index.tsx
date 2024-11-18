@@ -8,8 +8,9 @@ interface RenderFileProps {
 }
 
 const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
-    const [fileData, setFileData] = useState<string | null>(null);
-    const [fileType, setFileType] = useState<string | null>(null);
+    const [fileData, setFileData] = useState<string | undefined>(undefined);
+    const [fileName, setFileName] = useState<string | undefined>(undefined);
+    const [fileType, setFileType] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         const fetchFile = async () => {
@@ -17,7 +18,8 @@ const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
             if (response.ok) {
                 const data = await response.json();
                 console.log(data);
-                setFileData(data.data.signedUrl);
+                setFileData(data.data.fileContent ?? data.data.signedUrl);
+                setFileName(data.data.fileName);
                 setFileType(data.data.mimetype);
             } else {
                 console.error('Failed to fetch file');
@@ -28,7 +30,14 @@ const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
     }, [slug]);
 
     if (fileData) {
-        return <View fileId={slug} file={fileData!} fileType={fileType!} />;
+        return (
+            <View
+                fileId={slug}
+                file={fileData!}
+                fileType={fileType!}
+                fileName={fileName}
+            />
+        );
     } else {
         <>Loading file</>;
     }

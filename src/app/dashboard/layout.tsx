@@ -9,7 +9,7 @@ import {
     SidebarTrigger,
 } from '~/components/ui/sidebar';
 import { mapToNavItems } from '~/hooks/files/map';
-import { files } from '~/server/api/files';
+import { getStructure } from '~/server/api/files';
 import { getProfile } from '~/server/api/user';
 import { getServerSideSession } from '~/server/auth';
 import { NavMainItem, User } from '~/types/dashboard/sidebar';
@@ -29,7 +29,7 @@ export default async function RootLayout({
         avatar: userQuery.image ?? 'default',
     };
 
-    const fsQuery = await files.getStructure();
+    const fsQuery = await getStructure();
     const fs: NavMainItem[] | undefined = fsQuery
         ? mapToNavItems(fsQuery)
         : undefined;
