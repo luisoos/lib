@@ -1,4 +1,3 @@
-// Page.tsx
 import { NextResponse } from 'next/server';
 import RenderFile from '~/components/ui/file'; // Adjust import path as necessary
 

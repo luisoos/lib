@@ -7,6 +7,7 @@ import { ExtendedFileObject } from '~/types/files/structure';
 import { db } from '~/server/db';
 import { validateFileOwnership } from './shared/validateFileOwnership';
 import { FileContentOrSignedUrl, Metadata } from '~/types/files/db';
+import { revalidateTag } from 'next/cache';
 
 export async function getStructure() {
     // Get supabase client
@@ -266,6 +267,7 @@ export async function updateNote(
             data: uploadData,
             error: uploadError,
             status: !fileNameNotChanged && !removeError ? 301 : 200,
+            revalidate: 'sidebar',
         };
     } catch (error: any) {
         console.log(error);

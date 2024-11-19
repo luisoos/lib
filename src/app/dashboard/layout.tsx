@@ -8,17 +8,15 @@ import {
     SidebarInset,
     SidebarTrigger,
 } from '~/components/ui/sidebar';
-import { mapToNavItems } from '~/hooks/files/map';
-import { getStructure } from '~/server/api/files';
 import { getProfile } from '~/server/api/user';
 import { getServerSideSession } from '~/server/auth';
-import { NavMainItem, User } from '~/types/dashboard/sidebar';
+import { User } from '~/types/dashboard/sidebar';
+import QueryClientContextProvider from '~/components/QueryClientContextProvider';
 
 export default async function RootLayout({
     children,
 }: Readonly<{ children: React.ReactNode }>) {
     const session = await getServerSideSession();
-    // console.log(session)
     if (!session) redirect('auth/signin');
 
     const userQuery = await getProfile();
@@ -29,35 +27,10 @@ export default async function RootLayout({
         avatar: userQuery.image ?? 'default',
     };
 
-    const fsQuery = await getStructure();
-    const fs: NavMainItem[] | undefined = fsQuery
-        ? mapToNavItems(fsQuery)
-        : undefined;
-
     return (
-        <>
+        <QueryClientContextProvider>
             <SidebarProvider>
-                <AppSidebar
-                    user={user}
-                    navMain={fs}
-                    projects={[
-                        {
-                            name: 'Design Engineering',
-                            url: '#',
-                            icon: 'Frame',
-                        },
-                        {
-                            name: 'Sales & Marketing',
-                            url: '#',
-                            icon: 'PieChart',
-                        },
-                        {
-                            name: 'Travel',
-                            url: '#',
-                            icon: 'Map',
-                        },
-                    ]}
-                />
+                <AppSidebar user={user} />
                 <SidebarInset>
                     <header className='flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12'>
                         <div className='flex items-center gap-2 px-4'>
@@ -80,6 +53,6 @@ export default async function RootLayout({
                     </div> */}
                 </SidebarInset>
             </SidebarProvider>
-        </>
+        </QueryClientContextProvider>
     );
 }

@@ -1,3 +1,4 @@
+'use client';
 import '~/styles/tiptap.css';
 
 import {
@@ -12,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import { cn } from '~/hooks/utils';
 import useDebounce from '~/hooks/use-debounce';
 import removeExtension from '~/hooks/files/removeExtension';
+import { useQueryClient } from '@tanstack/react-query';
 
 const proseClasses = 'prose prose-sm sm:prose lg:prose-md prose-neutral';
 
@@ -27,6 +29,8 @@ export default ({
     const [title, setTitle] = useState(removeExtension(fileName));
     const [editorContent, setEditorContent] = useState(content);
     const debouncedContent = useDebounce([editorContent, title], 5000);
+
+    const queryClient = useQueryClient();
 
     const editor = useEditor({
         extensions: [StarterKit],
@@ -68,6 +72,10 @@ export default ({
                 const data = await response.json();
                 console.log(data);
                 setEditorContent(data.data.fileContent);
+                if (data.data.revalidate === 'sidebar') {
+                    console.log('test');
+                    queryClient.invalidateQueries({ queryKey: ['sidebar'] });
+                }
             } else {
                 console.error('Failed to fetch file');
             }
