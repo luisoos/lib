@@ -170,7 +170,7 @@ export async function uploadFile(
                 buffer,
                 {
                     contentType: fileType,
-                    upsert: true,
+                    upsert: fileName === 'New Note.txt' ? false : true,
                 },
             );
         console.log(error);
