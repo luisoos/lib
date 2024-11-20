@@ -41,7 +41,7 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
     const handleNewNoteClick = async () => {
         console.log('Button was clicked!', id);
         const file = new File(
-            ['This is the content of the new note.'],
+            [''],
             'New Note.txt',
             {
                 type: 'text/plain',
