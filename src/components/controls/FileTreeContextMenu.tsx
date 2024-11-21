@@ -40,13 +40,9 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
 
     const handleNewNoteClick = async () => {
         console.log('Button was clicked!', id);
-        const file = new File(
-            [''],
-            'New Note.txt',
-            {
-                type: 'text/plain',
-            },
-        );
+        const file = new File([''], 'New Note.txt', {
+            type: 'text/plain',
+        });
         await upload(file, id);
     };
 
