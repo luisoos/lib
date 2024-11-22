@@ -850,10 +850,10 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-code-block/-/extension-code-block-2.9.1.tgz#5a8c76729759e4505af40234c6011ad674ae4f7a"
   integrity sha512-A/50wPWDqEUUUPhrwRKILP5gXMO5UlQ0F6uBRGYB9CEVOREam9yIgvONOnZVJtszHqOayjIVMXbH/JMBeq11/g==
 
-"@tiptap/extension-code@^2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@tiptap/extension-code/-/extension-code-2.10.0.tgz#d22a3908f981a6f5b5cb099cac33e5979509d714"
-  integrity sha512-8JznKG1Jmv8gJezZGPoka8oRmfrcAAnMEOeMpKXjwMrIbQ6QynTZpqMGGVL1kfkZlLV84PYm+CGjGgjSsT4iZw==
+"@tiptap/extension-code@^2.10.2":
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-code/-/extension-code-2.10.2.tgz#616567f24258f9476e6e6637b3f509f6043b8fcf"
+  integrity sha512-VV14oeOsJ3VqUEjuUl+lzSW/IBLhurmcj9IiN2sq/Voin04dwvtchqP5fNXgmM3+rFM88zNOsbX0e4uSG4R10w==
 
 "@tiptap/extension-code@^2.9.1":
   version "2.9.1"
@@ -897,10 +897,10 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-heading/-/extension-heading-2.9.1.tgz#83a2cf3174b6e3da66298b5cd424aca8dc4738bb"
   integrity sha512-SjZowzLixOFaCrV2cMaWi1mp8REK0zK1b3OcVx7bCZfVSmsOETJyrAIUpCKA8o60NwF7pwhBg0MN8oXlNKMeFw==
 
-"@tiptap/extension-highlight@^2.10.0":
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/@tiptap/extension-highlight/-/extension-highlight-2.10.0.tgz#f3b9b2bc0cee2ba2efc8c9689736f5b20139d0d2"
-  integrity sha512-HU8UuKU7ljlzNn7jg29pM8QtIX7QvePcBjcWAt6K3qVwF1cbBNguIjKRY2rmoonU2nu8I6GknQNgV847kZifCQ==
+"@tiptap/extension-highlight@^2.10.2":
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-highlight/-/extension-highlight-2.10.2.tgz#a239071f16db337d38252ac96742ae552371ef4a"
+  integrity sha512-yJpqagUS672RPsGRc6JrNuqf3DbMiP+g4Al3cVpU3ff3yEORbCMsgvwkCOE9thSO9B4SOFQP4HzX2x1DLJtjew==
 
 "@tiptap/extension-history@^2.9.1":
   version "2.9.1"
@@ -916,6 +916,13 @@
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-italic/-/extension-italic-2.9.1.tgz#575f5f278d2f6999e0ad1e3b91010a010cb650e2"
   integrity sha512-VkNA6Vz96+/+7uBlsgM7bDXXx4b62T1fDam/3UKifA72aD/fZckeWrbT7KrtdUbzuIniJSbA0lpTs5FY29+86Q==
+
+"@tiptap/extension-link@^2.10.2":
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-link/-/extension-link-2.10.2.tgz#3139c5feddf352473e78e7f24318edc01fbfa557"
+  integrity sha512-bgsWdinDPGEiMD0NgphpKaxm4l9+PbPwdLDGDFyEX069VAyuSN4y63Sn32clpwlLcibVu3JxVFClJ+o6wKtmdg==
+  dependencies:
+    linkifyjs "^4.1.0"
 
 "@tiptap/extension-list-item@^2.9.1":
   version "2.9.1"
@@ -951,6 +958,16 @@
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-strike/-/extension-strike-2.9.1.tgz#8c8553e81696e6c30a6801a1cae6afaa4c37f002"
   integrity sha512-V5aEXdML+YojlPhastcu7w4biDPwmzy/fWq0T2qjfu5Te/THcqDmGYVBKESBm5x6nBy5OLkanw2O+KHu2quDdg==
+
+"@tiptap/extension-subscript@^2.10.2":
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-subscript/-/extension-subscript-2.10.2.tgz#a59e2017958d52f10fcf8a64bf01ff88aa4fc752"
+  integrity sha512-V6fxOl7+WWckXJfE9vx4c9Ab7PIc+lCH59WSwyp20Qe+tbEw6Qw1oP+qvwI82v3+XAhkexIlfhlMkwIoqKSTtA==
+
+"@tiptap/extension-superscript@^2.10.2":
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-superscript/-/extension-superscript-2.10.2.tgz#96e200811f5e26344238153a3a7f7fe9938fa71c"
+  integrity sha512-Cw4T99cgOMEqjjFrse2q8EBE9z8kDuCyGdkVYozrVtF+PRs1oyicp+JFKxm43fV5hMHtj/r4a8soIF93ll1JnA==
 
 "@tiptap/extension-table-cell@^2.10.0":
   version "2.10.0"
@@ -991,6 +1008,11 @@
   version "2.10.0"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-typography/-/extension-typography-2.10.0.tgz#a85f3296e5fcdc9b8063797fe388022274b8b75c"
   integrity sha512-03IOfJm4bk2hZ4SsSfxgBOVzcDxMRBlFD7ZY12H2EGNf1TKxj/0ANWhAH54FtquuOMoY5aWg5LZf0lk++8UDAw==
+
+"@tiptap/extension-underline@^2.10.2":
+  version "2.10.2"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-underline/-/extension-underline-2.10.2.tgz#283bf0ca5b9dafb1a3609147427d93a4405e673e"
+  integrity sha512-jDWGqqUYkrLgqRQDyqh+LpbkiqPfaWOoo5bydYL0u80GPEavovxZPoCJ/HDlOfdwm+FIPy55OP/29tELJRptmg==
 
 "@tiptap/pm@^2.9.1":
   version "2.9.1"
@@ -2981,6 +3003,11 @@ linkify-it@^5.0.0:
   integrity sha512-5aHCbzQRADcdP+ATqnDuhhJ/MRIqDkZX5pyjFHRRysS8vZ5AbqGEoFIb6pYHPZ+L/OC2Lc+xT8uHVVR5CAK/wQ==
   dependencies:
     uc.micro "^2.0.0"
+
+linkifyjs@^4.1.0:
+  version "4.1.4"
+  resolved "https://registry.yarnpkg.com/linkifyjs/-/linkifyjs-4.1.4.tgz#2766605a20078d50c90f35af22275a42dfb7dfc4"
+  integrity sha512-0/NxkHNpiJ0k9VrYCkAn9OtU1eu8xEr1tCCpDtSsVRm/SF0xAak2Gzv3QimSfgUgqLBCDlfhMbu73XvaEHUTPQ==
 
 locate-path@^6.0.0:
   version "6.0.0"

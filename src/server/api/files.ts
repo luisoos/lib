@@ -162,12 +162,14 @@ export async function uploadFile(
     // Decode the base64 file data
     const buffer = Buffer.from(fileData, 'base64');
 
+    console.log(buffer.toString());
+
     try {
         const { data, error } = await supabase.storage
             .from(env.SUPABASE_BUCKET_NAME)
             .upload(
                 `${userId}/${folder}${fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`,
-                buffer,
+                buffer.toString(),
                 {
                     contentType: fileType,
                     upsert: fileName === 'New Note.txt' ? false : true,
@@ -200,7 +202,7 @@ export async function updateNote(
     if (fileData) {
         // `fileData` is set; there is a change in the note body
         // Decode the base64 file data
-        content = Buffer.from(fileData, 'base64').toString();
+        content = fileData;
     } else if (fileNameNotChanged) {
         // `fileData` is not set and the name of the note was not changed (Nothing to update)
         return {
@@ -209,8 +211,6 @@ export async function updateNote(
             status: 400,
         };
     }
-
-    console.log(folder, fileNameNotChanged, fileName, fileData);
 
     // Name of the note was changed
     if (!fileNameNotChanged) {
@@ -253,7 +253,6 @@ export async function updateNote(
             .upload(newPath, content, {
                 upsert: true,
             });
-        console.log(uploadError);
 
         let removeError;
         if (!fileNameNotChanged) {
@@ -261,7 +260,6 @@ export async function updateNote(
                 await supabase.storage
                     .from(env.SUPABASE_BUCKET_NAME)
                     .remove([newPath]);
-            console.log(removeError);
         }
         return {
             data: uploadData,
