@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import getFileUrl from '~/hooks/files/getFileUrl';
+import validateQuery from '~/hooks/validateQuery';
 import { getStructure, uploadFile } from '~/server/api/files';
 
 const uploadFileSchema = z.object({
@@ -70,15 +71,27 @@ export async function POST(request: NextRequest) {
     try {
         const body = await request.json(); // Parse the JSON body of the request
         const parsedData = uploadFileSchema.parse(body);
+
+        const url = new URL(request.url);
+        const upsert = Boolean(
+            validateQuery(url.searchParams.get('upsert'))
+                ? url.searchParams.get('upsert')
+                : false,
+        );
+
         const data = await uploadFile(
             parsedData.fileName,
             parsedData.fileType,
             parsedData.fileData,
             parsedData.folderName,
+            upsert ? upsert : undefined,
         ); // Upload the file using provided data
 
         if (data?.error) {
-            return NextResponse.json({ success: false, data }, { status: 500 });
+            return NextResponse.json(
+                { success: false, error: data.error },
+                { status: data.status ?? 500 },
+            );
         } else {
             const url = request.nextUrl.clone();
             url.pathname = getFileUrl(

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import validateQuery from '~/hooks/validateQuery';
 import { getFileById, updateNote } from '~/server/api/files';
 
 const updateFileSchema = z.object({
@@ -84,13 +85,25 @@ export async function PUT(
 
         const body = await request.json(); // Parse the JSON body of the request
 
+        const url = new URL(request.url);
+        const upsert = Boolean(
+            validateQuery(url.searchParams.get('upsert'))
+                ? url.searchParams.get('upsert')
+                : false,
+        );
+
         // Validate the incoming data against the schema
         const parsedData = updateFileSchema.parse(body);
         const fileName = !parsedData.fileName.endsWith('.txt')
             ? parsedData.fileName + '.txt'
             : parsedData.fileName;
 
-        const data = await updateNote(fileName, slug, parsedData.fileData);
+        const data = await updateNote(
+            fileName,
+            slug,
+            parsedData.fileData,
+            upsert,
+        );
 
         if (!data || data.error) {
             console.error(
@@ -98,8 +111,8 @@ export async function PUT(
                 data.error || data.error.message,
             );
             return NextResponse.json(
-                { success: false, error: data.error.message },
-                { status: 500 }, // Internal Server Error
+                { success: false, error: data.error || data.error.message },
+                { status: data.status ?? 500 }, // Internal Server Error
             );
         }
 

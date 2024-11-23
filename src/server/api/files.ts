@@ -148,12 +148,18 @@ export async function uploadFile(
     fileType: string,
     fileData: string,
     folderName: string | undefined,
+    upsert?: true | undefined,
 ) {
     // Get supabase client and parameters
     const supabase = createClient();
     // Fetch authenticated user
     const user = await getProfile();
-    if (!user) return null;
+    if (!user)
+        return {
+            data: null,
+            error: 'Unauthorized',
+            status: 401,
+        };
     const userId = user.id;
 
     // Set folder
@@ -172,10 +178,26 @@ export async function uploadFile(
                 buffer.toString(),
                 {
                     contentType: fileType,
-                    upsert: fileName === 'New Note.txt' ? false : true,
+                    upsert:
+                        upsert || (fileName === 'New Note.txt' ? false : true),
                 },
             );
-        console.log(error);
+
+        if (error) {
+            if (error.message.includes('ResourceAlreadyExists')) {
+                return {
+                    data,
+                    error: 'There already is a resource at given file path.',
+                    status: 409,
+                };
+            } else {
+                return {
+                    data,
+                    error: error.message,
+                    status: 500,
+                };
+            }
+        }
         return { data, error };
     } catch (error) {
         console.log(error);
@@ -187,6 +209,7 @@ export async function updateNote(
     fileName: string,
     fileId: string,
     fileData: string | undefined,
+    upsert: boolean = false,
 ) {
     // Get supabase client and parameters
     const supabase = createClient('storage');
@@ -196,7 +219,13 @@ export async function updateNote(
     const userId = user.id;
 
     let content: string | undefined;
-    const folder: string[] = await getPathTokens(supabase, fileId);
+    const folder = await getPathTokens(supabase, fileId);
+    if (!Array.isArray(folder))
+        return {
+            data: null,
+            error: 'There is no file with the given `fileId`.',
+            status: 404,
+        };
     const fileNameNotChanged = folder[folder.length - 1] === fileName;
 
     if (fileData) {
@@ -251,21 +280,38 @@ export async function updateNote(
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from(env.SUPABASE_BUCKET_NAME)
             .upload(newPath, content, {
-                upsert: true,
+                upsert: upsert,
             });
+
+        if (uploadError) {
+            if ((uploadError as any).error.includes('Duplicate')) {
+                return {
+                    data: null,
+                    error: 'There already is a resource at given file path.',
+                    status: 409,
+                };
+            } else {
+                return {
+                    data: null,
+                    error: uploadError.message,
+                    status: 500,
+                };
+            }
+        }
 
         let removeError;
         if (!fileNameNotChanged) {
-            const { data: removeData, error: removeError } =
+            const { data: removeData, error: deleteFileError } =
                 await supabase.storage
                     .from(env.SUPABASE_BUCKET_NAME)
-                    .remove([newPath]);
+                    .remove([folder.join('/')]);
+            removeError = deleteFileError;
         }
         return {
             data: uploadData,
             error: uploadError,
             status: !fileNameNotChanged && !removeError ? 301 : 200,
-            revalidate: 'sidebar',
+            revalidate: !fileNameNotChanged ? 'redirect' : 'sidebar',
         };
     } catch (error: any) {
         console.log(error);
@@ -284,6 +330,7 @@ async function getPathTokens(
         .single(); // Expect a single record
 
     if (error) {
+        if (error.details.includes('The result contains 0 rows')) return 404;
         console.error('Error fetching path tokens:', error);
         throw new Error('Failed to fetch path tokens');
     }

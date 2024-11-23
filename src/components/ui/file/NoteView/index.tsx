@@ -1,7 +1,8 @@
 'use client';
+
 import '~/styles/tiptap.css';
 
-import { Editor, EditorContent, FloatingMenu, useEditor } from '@tiptap/react';
+import { EditorContent, useEditor } from '@tiptap/react';
 import Bold from '@tiptap/extension-bold';
 import Italic from '@tiptap/extension-italic';
 import Strike from '@tiptap/extension-strike';
@@ -23,16 +24,18 @@ import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import Text from '@tiptap/extension-text';
 import Typography from '@tiptap/extension-typography';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { cn } from '~/hooks/utils';
 import useDebounce from '~/hooks/use-debounce';
 import removeExtension from '~/hooks/files/removeExtension';
 import { useQueryClient } from '@tanstack/react-query';
 import { ColorHighlighter } from '~/hooks/files/colorHighlighter';
-import getButtonClasses from '~/components/ui/file/NoteView/getButtonClasses';
-import { HeadingDropdown } from './HeadingDropdown';
 import CompleteBubbleMenu from './BubbleMenu';
 import CompleteFloatingMenu from './FloatingMenu';
+import { useToast } from '~/hooks/use-toast';
+import { ToastAction } from '../../toast';
+import { useRouter } from 'next/navigation';
+import getFileUrl from '~/hooks/files/getFileUrl';
 
 const proseClasses = 'prose prose-sm sm:prose lg:prose-md prose-neutral';
 const proseTableClasses =
@@ -52,9 +55,12 @@ export default ({
         content,
     );
     const [editorContent, setEditorContent] = useState(content);
+    const [isFocused, setIsFocused] = useState<boolean>();
     const debouncedContent = useDebounce([editorContent, title], 2000);
 
+    const { toast } = useToast();
     const queryClient = useQueryClient();
+    const router = useRouter();
 
     const editor = useEditor({
         extensions: [
@@ -200,12 +206,58 @@ export default ({
 
                 setUpdatedContent(editorContent);
 
-                const data = await response.json();
-                console.log(data);
+                const json = await response.json();
 
-                if (data.data.revalidate === 'sidebar') {
-                    console.log('test');
-                    queryClient.invalidateQueries({ queryKey: ['sidebar'] });
+                if (response.status === 409) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Conflict',
+                        description:
+                            'There already is a file with this name at the given location.',
+                        action: (
+                            <ToastAction
+                                altText='Replace'
+                                onClick={async () => {
+                                    const toastResponse = await fetch(
+                                        `/api/routes/files/${fileId}?upsert=true`,
+                                        {
+                                            method: 'PUT',
+                                            headers: {
+                                                'Content-Type':
+                                                    'application/json',
+                                            },
+                                            body: JSON.stringify({
+                                                fileName: title,
+                                                fileData: editorContent,
+                                            }),
+                                        },
+                                    );
+                                    const toastJson =
+                                        await toastResponse.json();
+                                    router.push(
+                                        getFileUrl(
+                                            toastJson.data.data.id,
+                                            false,
+                                        ),
+                                    );
+                                }}>
+                                Replace
+                            </ToastAction>
+                        ),
+                    });
+                }
+
+                console.log(json);
+
+                if (json.data) {
+                    if (json.data.revalidate === 'sidebar') {
+                        console.log('test');
+                        queryClient.invalidateQueries({
+                            queryKey: ['sidebar'],
+                        });
+                    } else if (json.data.revalidate === 'redirect') {
+                        router.push(getFileUrl(json.data.data.id, false));
+                    }
                 }
             } catch (error: any) {
                 console.error(error.message);
@@ -215,7 +267,7 @@ export default ({
         if (editor && debouncedContent) {
             updateFile();
         }
-    }, [debouncedContent]); // Only depend on debounced values
+    }, [debouncedContent, isFocused]); // Only depend on debounced values
 
     return (
         <>
@@ -225,6 +277,8 @@ export default ({
                     type='text'
                     value={title}
                     onChange={handleTitleChange}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
                 />
             </div>
             {editor && <CompleteBubbleMenu editor={editor} />}
