@@ -300,7 +300,7 @@ export async function updateNote(
         }
 
         let removeError;
-        if (!fileNameNotChanged) {
+        if (!fileNameNotChanged && upsert) {
             const { data: removeData, error: deleteFileError } =
                 await supabase.storage
                     .from(env.SUPABASE_BUCKET_NAME)
