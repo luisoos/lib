@@ -1,11 +1,11 @@
-import { createClient } from '~/utils/supabase/server'; // Adjust import based on your setup
-import { getProfile } from './user';
+import { createClient } from '~/utils/supabase/server';
+import { getProfile } from '~/server/api/user';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { db } from '~/server/db';
 import { z } from 'zod';
 import { DatabaseHighlights } from '~/types/files/highlights';
 import { CommentedHighlight } from '~/types/files/pdf';
-import { validateFileOwnership } from './shared/validateFileOwnership';
+import { validateFileOwnership } from '~/server/api/shared/validateFileOwnership';
 
 // Define Zod schema for highlight creation
 export const highlightSchema = z.object({

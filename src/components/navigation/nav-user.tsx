@@ -28,6 +28,7 @@ import {
 } from '~/components/ui/sidebar';
 import { signOut } from 'next-auth/react';
 import { Button } from '~/components/ui/button';
+import { getInitials } from '~/hooks/utils';
 
 export function NavUser({
     user,
@@ -54,7 +55,7 @@ export function NavUser({
                                     alt={user.name}
                                 />
                                 <AvatarFallback className='rounded-lg'>
-                                    CN
+                                    { getInitials(user.name) }
                                 </AvatarFallback>
                             </Avatar>
                             <div className='grid flex-1 text-left text-sm leading-tight'>

@@ -3,9 +3,8 @@ import {
     SidebarMenuSubItem,
     SidebarMenuSubButton,
     SidebarMenuSub,
-} from './sidebar';
+} from '~/components/ui/sidebar';
 import { DynamicIcon } from '~/hooks/icons';
-import Dropzone from '~/components/controls/Dropzone';
 import FileTreeContextMenu from '../controls/FileTreeContextMenu';
 import removeExtension from '~/hooks/files/removeExtension';
 import getFileUrl from '~/hooks/files/getFileUrl';

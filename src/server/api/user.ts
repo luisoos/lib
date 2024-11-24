@@ -1,12 +1,11 @@
 import { z } from 'zod';
-import { getServerSession } from 'next-auth'; // Assuming you're using next-auth for session management
-import { db } from '~/server/db'; // Adjust the import based on your database setup
+import { db } from '~/server/db';
 import { redirect } from 'next/navigation';
 import { getServerSideSession } from '../auth';
 
 // Define Zod schema for input validation
 const getUserByEmailSchema = z.object({
-    email: z.string().email(), // Ensure the email is valid
+    email: z.string().email(),
 });
 
 // Action to get the current user's profile

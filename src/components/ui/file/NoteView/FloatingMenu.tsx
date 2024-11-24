@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/core';
 import { FloatingMenu } from '@tiptap/react';
-import getButtonClasses from './getButtonClasses';
-import { HeadingDropdown } from './HeadingDropdown';
-// import HighlightDropdown from './HighlightDropdown';
+import getButtonClasses from '~/components/ui/file/NoteView/getButtonClasses';
+import { HeadingDropdown } from '~/components/ui/file/NoteView/HeadingDropdown';
+
 import {
     List,
     ListOrdered,

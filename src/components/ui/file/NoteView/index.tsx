@@ -30,8 +30,8 @@ import useDebounce from '~/hooks/use-debounce';
 import removeExtension from '~/hooks/files/removeExtension';
 import { useQueryClient } from '@tanstack/react-query';
 import { ColorHighlighter } from '~/hooks/files/colorHighlighter';
-import CompleteBubbleMenu from './BubbleMenu';
-import CompleteFloatingMenu from './FloatingMenu';
+import CompleteBubbleMenu from '~/components/ui/file/NoteView/BubbleMenu';
+import CompleteFloatingMenu from '~/components/ui/file/NoteView/FloatingMenu';
 import { useToast } from '~/hooks/use-toast';
 import { ToastAction } from '../../toast';
 import { useRouter } from 'next/navigation';
@@ -189,7 +189,7 @@ export default ({
         const updateFile = async () => {
             try {
                 if (editorContent === updatedContent) return;
-                const response = await fetch(`/api/routes/files/${fileId}`, {
+                const response = await fetch(`/api/routes/files/${fileId}?upsert=${title === removeExtension(fileName)}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',

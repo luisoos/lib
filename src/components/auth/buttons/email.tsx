@@ -1,7 +1,7 @@
 'use client';
 
 import { Label } from '~/components/ui/label';
-import SignInButton from './signin';
+import SignInButton from '~/components/auth/buttons/signin';
 import { Input } from '~/components/ui/input';
 import { useState } from 'react';
 

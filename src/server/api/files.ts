@@ -1,13 +1,11 @@
 import { z } from 'zod';
-import { createClient } from '~/utils/supabase/server'; // Adjust import based on your setup
-import { env } from '~/env'; // Adjust import based on your environment setup
+import { createClient } from '~/utils/supabase/server';
+import { env } from '~/env';
 import { getProfile } from '~/server/api/user';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { ExtendedFileObject } from '~/types/files/structure';
-import { db } from '~/server/db';
-import { validateFileOwnership } from './shared/validateFileOwnership';
+import { validateFileOwnership } from '~/server/api/shared/validateFileOwnership';
 import { FileContentOrSignedUrl, Metadata } from '~/types/files/db';
-import { revalidateTag } from 'next/cache';
 
 export async function getStructure() {
     // Get supabase client
