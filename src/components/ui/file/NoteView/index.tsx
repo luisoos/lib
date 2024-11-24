@@ -188,7 +188,7 @@ export default ({
     useEffect(() => {
         const updateFile = async () => {
             try {
-                if (editorContent === updatedContent) return;
+                if (editorContent === updatedContent && title === removeExtension(fileName)) return;
                 const response = await fetch(`/api/routes/files/${fileId}?upsert=${title === removeExtension(fileName)}`, {
                     method: 'PUT',
                     headers: {
@@ -264,10 +264,10 @@ export default ({
             }
         };
 
-        if (editor && debouncedContent) {
+        if ((editor && debouncedContent)) {
             updateFile();
         }
-    }, [debouncedContent, isFocused]); // Only depend on debounced values
+    }, [debouncedContent, isFocused, title]); // Only depend on debounced values
 
     return (
         <>
