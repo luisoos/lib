@@ -1,6 +1,6 @@
 'use client';
 
-import { redirect } from 'next/navigation';
+import { redirect, usePathname, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     ContextMenu,
@@ -10,6 +10,7 @@ import {
     ContextMenuTrigger,
 } from '~/components/ui/context-menu';
 import upload from '~/hooks/files/upload';
+import { useToast } from '~/hooks/use-toast';
 import ControlComponentProps from '~/types/controls/ControlComponentProps';
 
 const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
@@ -17,26 +18,11 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
     className,
     children,
 }) => {
-    // const [file, setFile] = useState<File>();
-
-    // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     if(event.target.files) setFile(event.target.files![0]);
-    // };
-
-    // useEffect(() => {
-    //     const uploadFile = async () => {
-    //         if (file && id) {
-    //             console.log("Uploading file with id:", id);
-    //             try {
-    //                 await upload(file, id);
-    //             } catch (error) {
-    //                 console.error("Upload failed:", error);
-    //             }
-    //         }
-    //     };
-
-    //     uploadFile();
-    // }, [file, id]);
+    console.log(id)
+    const { toast } = useToast();
+    const router = useRouter();
+    
+  const pathname = usePathname()
 
     const handleNewNoteClick = async () => {
         console.log('Button was clicked!', id);
@@ -44,6 +30,37 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
             type: 'text/plain',
         });
         await upload(file, id);
+    };
+
+    const handleDeleteFileClick = async () => {
+        console.log(id)
+        const response = await fetch(
+            `/api/routes/files/${id}?upsert=true`,
+            {
+                method: 'DELETE', }
+        );
+        const json =
+            await response.json();
+        
+        if (response.ok) {
+            toast({
+                title: 'Deleted succesfully.',
+                description:
+                    'We successfully deleted the requested file.',
+            });
+            if (pathname.includes(id)) {
+                setTimeout(() => {
+                  router.push(`/dashboard`);
+                }, 5000);
+            }
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Failed to delete.',
+                description:
+                    'We had an error deleting the requested file.',
+            });
+        }
     };
 
     return (
@@ -59,17 +76,6 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
                         {id}
                     </ContextMenuItem>
                 )}
-                {/* <ContextMenuItem className='cursor-pointer'>
-                    <label htmlFor='file-upload' className='w-full'>
-                        <input
-                            id='file-upload'
-                            type='file'
-                            onChange={handleFileChange}
-                            className='hidden'
-                        />
-                        <ContextMenuAction icon='FileUp' label='Upload File' />
-                    </label>
-                </ContextMenuItem> */}
                 <ContextMenuItem>
                     <ContextMenuAction
                         onClick={handleNewNoteClick}
@@ -85,6 +91,7 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
                 </ContextMenuItem>
                 <ContextMenuItem>
                     <ContextMenuAction
+                        onClick={handleDeleteFileClick}
                         icon='Trash2'
                         label='Delete'
                         className='text-red-600'

@@ -267,7 +267,7 @@ export default ({
         if ((editor && debouncedContent)) {
             updateFile();
         }
-    }, [debouncedContent, isFocused, title]); // Only depend on debounced values
+    }, [debouncedContent, isFocused]); // Only depend on debounced values
 
     return (
         <>

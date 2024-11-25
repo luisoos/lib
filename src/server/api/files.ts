@@ -224,6 +224,18 @@ export async function updateNote(
             error: 'There is no file with the given `fileId`.',
             status: 404,
         };
+    if (userId !== folder[0])
+        return {
+            data: null,
+            error: 'Unauthorized',
+            status: 401,
+        };
+    // Save the original file path to work with the other variable; using `.join()` here
+    // is crucial: otherwise we would have to explicitly freeze it here, because the new 
+    // variable would just point to the original variable and thus also contain changes 
+    // we make to the latter in the upcoming steps.
+    const oldFilePath: string = folder.join('/');
+    // Check if the file name was not changed (if request and server-side filename are the same)
     const fileNameNotChanged = folder[folder.length - 1] === fileName;
 
     if (fileData) {
@@ -256,7 +268,6 @@ export async function updateNote(
             content = oldFile.data.fileContent;
         }
     }
-    // TODO add validation
 
     // Set new filename & path
     folder[folder.length - 1] = fileName
@@ -302,7 +313,7 @@ export async function updateNote(
             const { data: removeData, error: deleteFileError } =
                 await supabase.storage
                     .from(env.SUPABASE_BUCKET_NAME)
-                    .remove([folder.join('/')]);
+                    .remove([oldFilePath]);
             removeError = deleteFileError;
         }
         return {
@@ -310,6 +321,46 @@ export async function updateNote(
             error: uploadError,
             status: !fileNameNotChanged && !removeError ? 301 : 200,
             revalidate: !fileNameNotChanged ? 'redirect' : 'sidebar',
+        };
+    } catch (error: any) {
+        console.log(error);
+        return { data: null, error: error, status: error.status ?? 500 };
+    }
+}
+
+// Function to delete a file
+export async function deleteFile(
+    fileId: string,
+) {
+    // Get supabase client and parameters
+    const supabase = createClient('storage');
+    // Fetch authenticated user
+    const user = await getProfile();
+    if (!user) return { data: null, error: 'Unauthorized', status: 401 };
+    const userId = user.id;
+
+    const path = await getPathTokens(supabase, fileId);
+    if (!Array.isArray(path))
+        return {
+            data: null,
+            error: 'There is no file with the given `fileId`.',
+            status: 404,
+        };
+    if (userId !== path[0])
+        return {
+            data: null,
+            error: 'Unauthorized',
+            status: 401,
+        };
+
+    try {
+        const { data: removeData, error: deleteFileError } =
+            await supabase.storage
+                .from(env.SUPABASE_BUCKET_NAME)
+                .remove([path.join('/')]);
+        return {
+            data: removeData,
+            error: deleteFileError,
         };
     } catch (error: any) {
         console.log(error);

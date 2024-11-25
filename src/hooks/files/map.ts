@@ -3,6 +3,7 @@ import { ExtendedFileObject } from '~/types/files/structure';
 
 export function mapToNavItems(fsQuery: ExtendedFileObject[]): NavMainItem[] {
     return fsQuery.map((item) => ({
+        id: item.id,
         title: item.name,
         url: item.id,
         icon:

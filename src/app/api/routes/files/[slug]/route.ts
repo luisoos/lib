@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import validateQuery from '~/hooks/validateQuery';
-import { getFileById, updateNote } from '~/server/api/files';
+import { deleteFile, getFileById, updateNote } from '~/server/api/files';
 
 const updateFileSchema = z.object({
     fileName: z.string(), // Make fileName optional
@@ -65,12 +65,38 @@ export async function GET(
  * API Endpoint to update a file by its ID
  *
  * This function handles PUT requests to update a specific file identified by its ID.
+ * It expects the ID to be provided as a URL parameter and the updated file data in the request body.
  *
  * @async
  * @function PUT
  * @param {NextRequest} request - The incoming request object containing the request details.
- * @returns {Promise<NextResponse>} A promise that resolves to a NextResponse object indicating success or failure.
+ * @param {Object} params - An object containing route parameters.
+ * @param {string} params.id - The ID of the file to be updated.
+ * @returns {Promise<NextResponse>} A promise that resolves to a NextResponse object indicating success or failure of the update operation.
+ *
+ * @throws {Error} If there's an issue updating the file or if the provided ID is invalid.
+ *
+ * @example
+ * // Example usage in a client-side fetch:
+ * fetch(`/api/routes/files/${fileId}?upsert=${true}`, {
+ *   method: 'PUT',
+ *   headers: {
+ *     'Content-Type': 'application/json'
+ *   },
+ *   body: JSON.stringify(updatedFileData)
+ * })
+ * .then(response => {
+ *     if (response.ok) {
+ *         return response.json();
+ *     }
+ *     throw new Error('Failed to update file');
+ * })
+ * .then(data => console.log('File updated successfully:', data))
+ * .catch(error => console.error('Error:', error));
+ *
+ * @see {@link files.updateFileById} for the implementation of updating a file by its ID.
  */
+
 export async function PUT(
     request: NextRequest,
     { params }: { params: { slug: string } },
@@ -136,6 +162,78 @@ export async function PUT(
 
         return NextResponse.json(
             { success: false, error: 'Failed to update file' },
+            { status: 500 }, // Internal Server Error
+        );
+    }
+}
+
+/**
+ * API Endpoint to delete a file by its ID
+ *
+ * This function handles DELETE requests to remove a specific file identified by its ID.
+ * It expects the ID to be provided as a URL parameter.
+ *
+ * @async
+ * @function DELETE
+ * @param {NextRequest} request - The incoming request object containing the request details.
+ * @param {Object} params - An object containing route parameters.
+ * @param {string} params.id - The ID of the file to be deleted.
+ * @returns {Promise<NextResponse>} A promise that resolves to a NextResponse object indicating success or failure of the deletion operation.
+ *
+ * @throws {Error} If there's an issue deleting the file or if the provided ID is invalid.
+ *
+ * @example
+ * // Example usage in a client-side fetch:
+ * fetch(`/api/routes/files/${fileId}`, {
+ *   method: 'DELETE'
+ * })
+ * .then(response => {
+ *     if (response.ok) {
+ *         return response.json();
+ *     }
+ *     throw new Error('Failed to delete file');
+ * })
+ * .then(data => console.log('File deleted successfully:', data))
+ * .catch(error => console.error('Error:', error));
+ *
+ * @see {@link files.deleteFileById} for the implementation of deleting a file by its ID.
+ */
+
+export async function DELETE(
+    request: NextRequest,
+    { params }: { params: { id: string } },
+) {
+    try {
+        const id = params.id;
+        if (!id)
+            return NextResponse.json(
+                { success: false, error: 'Bad request' },
+                { status: 400 },
+            );
+
+        // Call your delete function here, e.g., deleteFileById
+        const result = await deleteFile(id);
+
+        if (!result || result.error) {
+            console.error(
+                'Error deleting file:',
+                result.error || result.error.message,
+            );
+            return NextResponse.json(
+                { success: false, error: result.error || result.error.message },
+                { status: result.status ?? 500 }, // Internal Server Error
+            );
+        }
+
+        return NextResponse.json(
+            { success: true, message: 'File deleted successfully' },
+            { status: 200 }, // OK status
+        );
+    } catch (error) {
+        console.error('Error deleting file:', error);
+
+        return NextResponse.json(
+            { success: false, error: 'Failed to delete file' },
             { status: 500 }, // Internal Server Error
         );
     }

@@ -31,13 +31,7 @@ export function NavMain({
     items,
     isLoading,
 }: {
-    items: {
-        title: string;
-        url: string;
-        icon?: string;
-        isActive?: boolean;
-        items?: NavMainItem[];
-    }[];
+    items: NavMainItem[];
     isLoading?: boolean;
 }) {
     const pathname = usePathname();
@@ -46,13 +40,16 @@ export function NavMain({
     return (
         <SidebarGroup>
             <div className='flex'>
-                <SidebarGroupLabel>Notebooks</SidebarGroupLabel>
+                <SidebarGroupLabel>Notes</SidebarGroupLabel>
                 <FileUpload />
             </div>
             {!isLoading ? (
                 <SidebarMenu>
                     {items.map((item) => {
                         item.isActive = pathname === getFileUrl(item.url);
+                        // TODO; when we pass the id (it is correct here) to file tree context menu, its the title and not the id
+                        const id = Object.freeze(item.id ?? item.title)
+                        console.log(id, item.id ?? item.title)
                         return !item.url ? (
                             <Collapsible
                                 key={item.title + item.items?.length}
@@ -61,7 +58,7 @@ export function NavMain({
                                 className='group/collapsible'>
                                 <SidebarMenuItem>
                                     <CollapsibleTrigger asChild>
-                                        <FileTreeContextMenu id={item.title}>
+                                        <FileTreeContextMenu id={id}>
                                             <SidebarMenuButton
                                                 tooltip={item.title}
                                                 className='text-black'>

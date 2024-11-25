@@ -5,6 +5,7 @@ export type User = {
 };
 
 export type NavMainItem = {
+    id: string | null;
     title: string;
     url: string;
     icon?: string;
