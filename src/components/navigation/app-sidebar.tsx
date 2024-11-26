@@ -55,8 +55,8 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
             <SidebarContent className='h-full'>
                 {/* {isError && <p>Error: {error.message}</p>} Show error message */}
                 <NavMain items={navMain} isLoading={isLoading} />
-                <Dropzone id={''} className='h-full max-h-96'>
-                    <FileTreeContextMenu id={''}>
+                <Dropzone className='h-full max-h-96'>
+                    <FileTreeContextMenu>
                         <div className='h-full w-full -translate-y-4'></div>
                     </FileTreeContextMenu>
                 </Dropzone>

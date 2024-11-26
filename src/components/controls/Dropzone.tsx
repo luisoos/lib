@@ -9,7 +9,7 @@ import FileTreeContextMenu from '~/components/controls/FileTreeContextMenu';
 import ControlComponentProps from '~/types/controls/ControlComponentProps';
 
 const Dropzone: React.FC<ControlComponentProps> = ({
-    id,
+    item,
     className,
     children,
 }) => {
@@ -30,7 +30,7 @@ const Dropzone: React.FC<ControlComponentProps> = ({
         const uploadFile = async (id: string) => {
             await upload(file, id);
         };
-        uploadFile(id);
+        uploadFile(item?.id ?? '');
     }, [file]);
 
     return (

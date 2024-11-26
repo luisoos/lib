@@ -201,10 +201,10 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } },
+    { params }: { params: { slug: string } },
 ) {
     try {
-        const id = params.id;
+        const id = params.slug;
         if (!id)
             return NextResponse.json(
                 { success: false, error: 'Bad request' },

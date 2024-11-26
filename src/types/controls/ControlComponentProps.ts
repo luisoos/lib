@@ -1,5 +1,7 @@
+import { NavMainItem } from "../dashboard/sidebar";
+
 export default interface ControlComponentProps {
-    id: string;
+    item?: NavMainItem | null;
     className?: string;
     children?: React.ReactNode;
 }
