@@ -1,28 +1,56 @@
-# Create T3 App
+# `/lib`
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+Chat with all of your documents at once. Perfect for school & university. 
 
-## What's next? How do I make an app with this?
+> [!NOTE]
+> `/lib` is a web-based SaaS that lets users use huge context-aware vector AI.
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+## Tech Stack
+This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`. Both the Backend and Frontend are made using [Next.js](https://nextjs.org) with TypeScript. Furthermore, this project uses:
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
-
--   [Next.js](https://nextjs.org)
 -   [NextAuth.js](https://next-auth.js.org)
+-   [Supabase](https://supabase.com)
 -   [Prisma](https://prisma.io)
--   [Drizzle](https://orm.drizzle.team)
 -   [Tailwind CSS](https://tailwindcss.com)
+-   [shadcn/ui](https://ui.shadcn.com)
+-   [Prettier](https://prettier.io/)
 
-## Learn More
+## Installation
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+> [!IMPORTANT]
+> This project is currently under development.
 
--   [Documentation](https://create.t3.gg/)
--   [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+#### Install dependencies
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+```bash
+yarn install
+```
 
-## How do I deploy this?
+#### Serve in development
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+```bash
+yarn dev
+```
+
+##### Commands for development
+
+```bash
+# Generate Prisma client and database schema
+yarn db:generate
+
+# Apply pending database migrations
+yarn db:migrate
+
+# Push schema changes to the database without migrations
+yarn db:push
+
+# Open Prisma Studio to view and edit data
+yarn db:studio
+```
+
+#### Build
+
+```bash
+yarn build
+```
+
