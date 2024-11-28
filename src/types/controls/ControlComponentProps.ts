@@ -1,4 +1,4 @@
-import { NavMainItem } from "../dashboard/sidebar";
+import { NavMainItem } from '../dashboard/sidebar';
 
 export default interface ControlComponentProps {
     item?: NavMainItem | null;

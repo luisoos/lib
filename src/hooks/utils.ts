@@ -12,5 +12,9 @@ export function ucfirst(str: string): string {
 }
 
 export function getInitials(s: string): string {
-    return s.split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() || '').join('');
+    return s
+        .split(' ')
+        .slice(0, 2)
+        .map((w) => w[0]?.toUpperCase() || '')
+        .join('');
 }

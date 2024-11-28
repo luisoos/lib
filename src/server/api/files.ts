@@ -6,21 +6,33 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { ExtendedFileObject } from '~/types/files/structure';
 import { validateFileOwnership } from '~/server/api/shared/validateFileOwnership';
 import { FileContentOrSignedUrl, Metadata } from '~/types/files/db';
+import { ServerActionResponse, UploadData } from '~/types/api/response';
+import { FileObject, StorageError } from '@supabase/storage-js';
 
-export async function getStructure() {
+export async function getStructure(): Promise<
+    ServerActionResponse<ExtendedFileObject[]>
+> {
     // Get supabase client
     const supabase = createClient();
     // Fetch authenticated user
     const user = await getProfile();
-    if (!user) return null;
+    if (!user) return { data: null, error: 'Unauthorized', status: 401 };
     const userId = user.id;
-    return listFilesInFolder(supabase, userId);
+
+    const structure = await listFilesInFolder(supabase, userId);
+    if (structure instanceof StorageError)
+        return {
+            data: null,
+            error: structure,
+            status: 500,
+        };
+    return { data: structure, error: null, status: 200 };
 }
 
 async function listFilesInFolder(
     supabase: SupabaseClient<any, string, any>,
     path: string,
-) {
+): Promise<ExtendedFileObject[] | StorageError> {
     const { data: files, error } = await supabase.storage
         .from(env.SUPABASE_BUCKET_NAME)
         .list(path, {
@@ -30,7 +42,7 @@ async function listFilesInFolder(
 
     if (error) {
         console.error('Error fetching files:', error);
-        return [];
+        return error;
     }
 
     const folders: ExtendedFileObject[] = files.filter(
@@ -42,6 +54,7 @@ async function listFilesInFolder(
             supabase,
             `${path}/${folder.name}`,
         );
+        if (nestedFiles instanceof StorageError) return nestedFiles;
         if (!folder.sub) folder.sub = [];
         folder.sub.push(...nestedFiles);
     }
@@ -51,7 +64,9 @@ async function listFilesInFolder(
     return allFiles;
 }
 
-export async function getFileById(fileId: string) {
+export async function getFileById(
+    fileId: string,
+): Promise<ServerActionResponse<FileContentOrSignedUrl>> {
     // Get supabase client
     const supabase = createClient('storage');
 
@@ -106,10 +121,10 @@ export async function getFileById(fileId: string) {
                 .from(env.SUPABASE_BUCKET_NAME)
                 .download(path);
 
-        if (!fileContent || storageError)
+        if (storageError ?? !fileContent)
             return {
                 data: null,
-                error: 'Error downloading file.',
+                error: storageError,
                 status: 500,
             };
 
@@ -137,7 +152,7 @@ export async function getFileById(fileId: string) {
         };
     }
 
-    return { data, error };
+    return { data, error, status: 200 };
 }
 
 // Function to upload a file
@@ -147,7 +162,7 @@ export async function uploadFile(
     fileData: string,
     folderName: string | undefined,
     upsert?: true | undefined,
-) {
+): Promise<ServerActionResponse<UploadData>> {
     // Get supabase client and parameters
     const supabase = createClient();
     // Fetch authenticated user
@@ -166,40 +181,33 @@ export async function uploadFile(
     // Decode the base64 file data
     const buffer = Buffer.from(fileData, 'base64');
 
-    console.log(buffer.toString());
+    const { data, error } = await supabase.storage
+        .from(env.SUPABASE_BUCKET_NAME)
+        .upload(
+            `${userId}/${folder}${fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`,
+            buffer.toString(),
+            {
+                contentType: fileType,
+                upsert: upsert || (fileName === 'New Note.txt' ? false : true),
+            },
+        );
 
-    try {
-        const { data, error } = await supabase.storage
-            .from(env.SUPABASE_BUCKET_NAME)
-            .upload(
-                `${userId}/${folder}${fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`,
-                buffer.toString(),
-                {
-                    contentType: fileType,
-                    upsert:
-                        upsert || (fileName === 'New Note.txt' ? false : true),
-                },
-            );
-
-        if (error) {
-            if (error.message.includes('ResourceAlreadyExists')) {
-                return {
-                    data,
-                    error: 'There already is a resource at given file path.',
-                    status: 409,
-                };
-            } else {
-                return {
-                    data,
-                    error: error.message,
-                    status: 500,
-                };
-            }
+    if (error) {
+        if (error.message.includes('ResourceAlreadyExists')) {
+            return {
+                data,
+                error: 'There already is a resource at given file path',
+                status: 409,
+            };
+        } else {
+            return {
+                data,
+                error: error,
+                status: 500,
+            };
         }
-        return { data, error };
-    } catch (error) {
-        console.log(error);
     }
+    return { data, error, status: 200 };
 }
 
 // Function to update a file
@@ -208,7 +216,7 @@ export async function updateNote(
     fileId: string,
     fileData: string | undefined,
     upsert: boolean = false,
-) {
+): Promise<ServerActionResponse<UploadData>> {
     // Get supabase client and parameters
     const supabase = createClient('storage');
     // Fetch authenticated user
@@ -221,7 +229,7 @@ export async function updateNote(
     if (!Array.isArray(folder))
         return {
             data: null,
-            error: 'There is no file with the given `fileId`.',
+            error: 'There is no file with the given `fileId`',
             status: 404,
         };
     if (userId !== folder[0])
@@ -231,8 +239,8 @@ export async function updateNote(
             status: 401,
         };
     // Save the original file path to work with the other variable; using `.join()` here
-    // is crucial: otherwise we would have to explicitly freeze it here, because the new 
-    // variable would just point to the original variable and thus also contain changes 
+    // is crucial: otherwise we would have to explicitly freeze it here, because the new
+    // variable would just point to the original variable and thus also contain changes
     // we make to the latter in the upcoming steps.
     const oldFilePath: string = folder.join('/');
     // Check if the file name was not changed (if request and server-side filename are the same)
@@ -246,7 +254,7 @@ export async function updateNote(
         // `fileData` is not set and the name of the note was not changed (Nothing to update)
         return {
             data: null,
-            error: '`fileData` is undefined and the `fileName` is the same.',
+            error: '`fileData` is undefined and the `fileName` is the same',
             status: 400,
         };
     }
@@ -261,7 +269,7 @@ export async function updateNote(
             if (!oldFile.data || oldFile.error || 'signedUrl' in oldFile.data)
                 return {
                     data: null,
-                    error: 'File should only be renamed but could not be retrieved.',
+                    error: 'File should only be renamed but could not be retrieved',
                     status: 400,
                 };
             // Decode the base64 file data
@@ -281,7 +289,7 @@ export async function updateNote(
     if (!content)
         return {
             data: null,
-            error: 'Internal error while preparing Supabase transaction.',
+            error: 'Internal error while preparing Supabase transaction',
             status: 500,
         };
 
@@ -296,13 +304,13 @@ export async function updateNote(
             if ((uploadError as any).error.includes('Duplicate')) {
                 return {
                     data: null,
-                    error: 'There already is a resource at given file path.',
+                    error: 'There already is a resource at given file path',
                     status: 409,
                 };
             } else {
                 return {
                     data: null,
-                    error: uploadError.message,
+                    error: uploadError,
                     status: 500,
                 };
             }
@@ -331,7 +339,7 @@ export async function updateNote(
 // Function to delete a file
 export async function deleteFile(
     fileId: string,
-) {
+): Promise<ServerActionResponse<FileObject[]>> {
     // Get supabase client and parameters
     const supabase = createClient('storage');
     // Fetch authenticated user
@@ -343,7 +351,7 @@ export async function deleteFile(
     if (!Array.isArray(path))
         return {
             data: null,
-            error: 'There is no file with the given `fileId`.',
+            error: 'There is no file with the given `fileId`',
             status: 404,
         };
     if (userId !== path[0])
@@ -361,6 +369,7 @@ export async function deleteFile(
         return {
             data: removeData,
             error: deleteFileError,
+            status: deleteFileError ? 500 : 200,
         };
     } catch (error: any) {
         console.log(error);

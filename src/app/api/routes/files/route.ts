@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
                 : false,
         );
 
-        const data = await uploadFile(
+        const file = await uploadFile(
             parsedData.fileName,
             parsedData.fileType,
             parsedData.fileData,
@@ -87,19 +87,19 @@ export async function POST(request: NextRequest) {
             upsert ? upsert : undefined,
         ); // Upload the file using provided data
 
-        if (data?.error) {
+        if (!file.data || file.error) {
             return NextResponse.json(
-                { success: false, error: data.error },
-                { status: data.status ?? 500 },
+                { success: false, error: file.error },
+                { status: file.status ?? 500 },
             );
         } else {
             const url = request.nextUrl.clone();
             url.pathname = getFileUrl(
-                data!.data!.path.split('/').slice(1).join('/'),
+                file!.data!.path.split('/').slice(1).join('/'),
                 true,
             );
             // return NextResponse.redirect(url); // Redirect to the uploaded file's URL
-            return NextResponse.json({ success: true, data });
+            return NextResponse.json({ success: true, data: file.data });
         }
     } catch (error) {
         console.error('Error uploading file:', error);

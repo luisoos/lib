@@ -37,11 +37,12 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
         queryKey: ['sidebar'],
         queryFn: fetchFiles,
         retry: false, // Optional: prevent automatic retries
+        refetchInterval: 1000 * 30,
     });
 
     useEffect(() => {
         if (data) {
-            setNavMain(mapToNavItems(data));
+            setNavMain(mapToNavItems(data.data));
         }
     }, [data]);
 

@@ -124,26 +124,22 @@ export async function PUT(
             ? parsedData.fileName + '.txt'
             : parsedData.fileName;
 
-        const data = await updateNote(
+        const note = await updateNote(
             fileName,
             slug,
             parsedData.fileData,
             upsert,
         );
 
-        if (!data || data.error) {
-            console.error(
-                'Error updating file:',
-                data.error || data.error.message,
-            );
+        if (!note.data || note.error) {
             return NextResponse.json(
-                { success: false, error: data.error || data.error.message },
-                { status: data.status ?? 500 }, // Internal Server Error
+                { success: false, error: note.error },
+                { status: note.status ?? 500 }, // Internal Server Error
             );
         }
 
         return NextResponse.json(
-            { success: true, data },
+            { success: true, data: note.data },
             { status: 200 }, // OK status
         );
     } catch (error) {
@@ -214,13 +210,9 @@ export async function DELETE(
         // Call your delete function here, e.g., deleteFileById
         const result = await deleteFile(id);
 
-        if (!result || result.error) {
-            console.error(
-                'Error deleting file:',
-                result.error || result.error.message,
-            );
+        if (!result.data || result.error) {
             return NextResponse.json(
-                { success: false, error: result.error || result.error.message },
+                { success: false, error: result.error },
                 { status: result.status ?? 500 }, // Internal Server Error
             );
         }

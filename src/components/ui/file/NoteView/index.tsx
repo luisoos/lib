@@ -188,17 +188,24 @@ export default ({
     useEffect(() => {
         const updateFile = async () => {
             try {
-                if (editorContent === updatedContent && title === removeExtension(fileName)) return;
-                const response = await fetch(`/api/routes/files/${fileId}?upsert=${title === removeExtension(fileName)}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
+                if (
+                    editorContent === updatedContent &&
+                    title === removeExtension(fileName)
+                )
+                    return;
+                const response = await fetch(
+                    `/api/routes/files/${fileId}?upsert=${title === removeExtension(fileName)}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            fileName: title,
+                            fileData: editorContent,
+                        }),
                     },
-                    body: JSON.stringify({
-                        fileName: title,
-                        fileData: editorContent,
-                    }),
-                });
+                );
 
                 if (!response.ok) {
                     console.error('Failed to fetch file');
@@ -264,7 +271,7 @@ export default ({
             }
         };
 
-        if ((editor && debouncedContent)) {
+        if (editor && debouncedContent) {
             updateFile();
         }
     }, [debouncedContent, isFocused]); // Only depend on debounced values

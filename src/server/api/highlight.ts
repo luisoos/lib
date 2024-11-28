@@ -1,11 +1,12 @@
 import { createClient } from '~/utils/supabase/server';
 import { getProfile } from '~/server/api/user';
-import { SupabaseClient } from '@supabase/supabase-js';
 import { db } from '~/server/db';
 import { z } from 'zod';
 import { DatabaseHighlights } from '~/types/files/highlights';
 import { CommentedHighlight } from '~/types/files/pdf';
 import { validateFileOwnership } from '~/server/api/shared/validateFileOwnership';
+import { ServerActionResponse } from '~/types/api/response';
+import { JsonValue } from '@prisma/client/runtime/library';
 
 // Define Zod schema for highlight creation
 export const highlightSchema = z.object({
@@ -16,11 +17,18 @@ export const highlightSchema = z.object({
 });
 
 // Function to create a highlight
-export async function createHighlight(body: any) {
+export async function createHighlight(body: any): Promise<
+    ServerActionResponse<{
+        title: string;
+        description: string | null;
+        storageObjectId: string;
+        data: JsonValue;
+    }>
+> {
     const parsedInput = highlightSchema.parse(body); // Use the new schema
 
     const user = await getProfile();
-    if (!user) return null;
+    if (!user) return { data: null, error: 'Unauthorized', status: 401 };
 
     const supabase = createClient('storage');
     const validation = await validateFileOwnership(
@@ -30,8 +38,7 @@ export async function createHighlight(body: any) {
     );
 
     if (!validation) {
-        console.error('User does not own the file.');
-        return null; // Optionally handle unauthorized access
+        return { data: null, error: 'Unauthorized', status: 401 };
     }
 
     const highlight = await db.highlight.create({
@@ -43,13 +50,23 @@ export async function createHighlight(body: any) {
         },
     });
 
-    return highlight;
+    return { data: highlight, error: null, status: 401 };
 }
 
 // Function to update a highlight (only description is allowed to be updated)
-export async function updateHighlight(id: number, newDescription: string) {
+export async function updateHighlight(
+    id: number,
+    newDescription: string,
+): Promise<
+    ServerActionResponse<{
+        title: string;
+        description: string | null;
+        storageObjectId: string;
+        data: JsonValue;
+    }>
+> {
     const user = await getProfile();
-    if (!user) return null;
+    if (!user) return { data: null, error: 'Unauthorized', status: 401 };
 
     const supabase = createClient('storage');
 
@@ -59,8 +76,7 @@ export async function updateHighlight(id: number, newDescription: string) {
     });
 
     if (!highlight) {
-        console.error('Highlight not found.');
-        return null;
+        return { data: null, error: 'Not found', status: 404 };
     }
 
     const validation = await validateFileOwnership(
@@ -70,8 +86,7 @@ export async function updateHighlight(id: number, newDescription: string) {
     );
 
     if (!validation) {
-        console.error('User does not own the file.');
-        return null; // Optionally handle unauthorized access
+        return { data: null, error: 'Unauthorized', status: 401 };
     }
 
     // Update only the description
@@ -80,13 +95,20 @@ export async function updateHighlight(id: number, newDescription: string) {
         data: { description: newDescription },
     });
 
-    return updatedHighlight;
+    return { data: updatedHighlight, error: null, status: 401 };
 }
 
 // Function to delete a highlight
-export async function deleteHighlight(id: number) {
+export async function deleteHighlight(id: number): Promise<
+    ServerActionResponse<{
+        title: string;
+        description: string | null;
+        storageObjectId: string;
+        data: JsonValue;
+    }>
+> {
     const user = await getProfile();
-    if (!user) return null;
+    if (!user) return { data: null, error: 'Unauthorized', status: 401 };
 
     const supabase = createClient('storage');
 
@@ -97,7 +119,7 @@ export async function deleteHighlight(id: number) {
 
     if (!highlight) {
         console.error('Highlight not found.');
-        return null;
+        return { data: null, error: 'Not found', status: 404 };
     }
 
     const validation = await validateFileOwnership(
@@ -108,38 +130,42 @@ export async function deleteHighlight(id: number) {
 
     if (!validation) {
         console.error('User does not own the file.');
-        return null; // Optionally handle unauthorized access
+        return { data: null, error: 'Unauthorized', status: 401 };
     }
 
     // Delete the highlight
-    await db.highlight.delete({
+    const deletedHighlight = await db.highlight.delete({
         where: { id },
     });
 
-    return { success: true };
+    return { data: deletedHighlight, error: null, status: 200 };
 }
 
 // Function to get a specific highlight by ID
-export async function getHighlightById(id: number) {
+export async function getHighlightById(
+    id: number,
+): Promise<ServerActionResponse<CommentedHighlight[]>> {
     const highlight = await db.highlight.findUnique({
         where: { id },
     });
 
     if (!highlight) {
         console.error('Highlight not found.');
-        return null;
+        return { data: null, error: 'Not found', status: 404 };
     }
 
-    return mapHighlights(highlight);
+    return { data: mapHighlights(highlight), error: null, status: 200 };
 }
 
 // Function to get all highlights for a specific file
-export async function getAllHighlightsForFile(fileId: string) {
+export async function getAllHighlightsForFile(
+    fileId: string,
+): Promise<ServerActionResponse<CommentedHighlight[]>> {
     const highlights = await db.highlight.findMany({
         where: { storageObjectId: fileId },
     });
 
-    return mapHighlights(highlights);
+    return { data: mapHighlights(highlights), error: null, status: 200 };
 }
 
 function mapHighlights(

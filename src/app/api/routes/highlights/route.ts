@@ -64,22 +64,25 @@ export async function POST(request: NextRequest) {
 
         const highlight = await createHighlight(highlightData); // Call the createHighlight function with structured data
 
-        if (!highlight) {
+        if (!highlight.data) {
             return NextResponse.json(
                 {
                     success: false,
                     message: 'User not authorized or highlight creation failed',
                 },
-                { status: 403 }, // Forbidden status
+                { status: 403 },
             );
         }
 
-        return NextResponse.json({ success: true, highlight }, { status: 201 }); // Created status
+        return NextResponse.json(
+            { success: true, highlight: highlight.data },
+            { status: 201 },
+        );
     } catch (error) {
         console.error('Error creating highlight:', error);
         return NextResponse.json(
             { success: false, error: 'Failed to create highlight' },
-            { status: 500 }, // Internal Server Error
+            { status: 500 },
         );
     }
 }
@@ -122,7 +125,7 @@ export async function GET(request: NextRequest) {
             const id = parseInt(idParam);
             const highlight = await getHighlightById(id);
 
-            if (!highlight) {
+            if (!highlight.data) {
                 return NextResponse.json(
                     { success: false, message: 'Highlight not found' },
                     { status: 404 },
@@ -130,15 +133,23 @@ export async function GET(request: NextRequest) {
             }
 
             return NextResponse.json(
-                { success: true, highlight },
+                { success: true, highlight: highlight.data },
                 { status: 200 },
             );
         } else {
             const fileIdParam = url.searchParams.get('fileId');
             if (fileIdParam) {
                 const highlights = await getAllHighlightsForFile(fileIdParam);
+
+                if (!highlights.data) {
+                    return NextResponse.json(
+                        { success: false, message: 'Highlight not found' },
+                        { status: 404 },
+                    );
+                }
+
                 return NextResponse.json(
-                    { success: true, highlights },
+                    { success: true, highlights: highlights.data },
                     { status: 200 },
                 );
             }
@@ -199,14 +210,14 @@ export async function DELETE(request: NextRequest) {
         const id = parseInt(idParam);
         const result = await deleteHighlight(id);
 
-        if (!result || !result.success) {
+        if (!result.data) {
             return NextResponse.json(
                 { success: false, message: 'Failed to delete highlight' },
                 { status: 403 },
             );
         }
 
-        return NextResponse.json({ success: true }, { status: 204 }); // No Content status on successful deletion
+        return NextResponse.json({ success: true }, { status: 200 });
     } catch (error) {
         console.error('Error deleting highlight:', error);
         return NextResponse.json(
@@ -283,7 +294,7 @@ export async function PATCH(request: NextRequest) {
             parsedData.description,
         );
 
-        if (!updatedHighlight) {
+        if (!updatedHighlight.data) {
             return NextResponse.json(
                 {
                     success: false,
@@ -294,7 +305,7 @@ export async function PATCH(request: NextRequest) {
         }
 
         return NextResponse.json(
-            { success: true, updatedHighlight },
+            { success: true, highlight: updatedHighlight.data },
             { status: 200 },
         ); // OK status
     } catch (error) {

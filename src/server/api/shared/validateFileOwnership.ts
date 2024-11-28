@@ -5,7 +5,7 @@ export async function validateFileOwnership(
     supabase: SupabaseClient<any, string, any>,
     fileId: string,
     userId: string,
-) {
+): Promise<boolean> {
     const { data: fileData, error: fileError } = await supabase
         .from('objects')
         .select('name')

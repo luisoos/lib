@@ -100,8 +100,7 @@ export function NavMain({
                             <Link
                                 href={getFileUrl(item.url, isDashboard)}
                                 key={item.url}>
-                                <FileTreeContextMenu
-                                    item={item}>
+                                <FileTreeContextMenu item={item}>
                                     <SidebarMenuButton
                                         tooltip={item.title}
                                         className='text-black'>
