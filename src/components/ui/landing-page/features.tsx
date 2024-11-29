@@ -7,7 +7,7 @@ export function Features() {
     return (
         <>
             <h2 className='text-center text-2xl font-semibold mb-2'>
-                Why people ❤ {env.NEXT_PUBLIC_PROJECT_NAME} ...
+                Why people ❤ {env.NEXT_PUBLIC_PROJECT_NAME}{' '}
             </h2>
             <BentoGrid className='max-w-4xl mx-auto md:auto-rows-[20rem] cursor-crosshair'>
                 {items.map((item, i) => (
