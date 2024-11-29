@@ -8,14 +8,15 @@ import { env } from '~/env';
 // Icons
 import { ArrowRight } from 'lucide-react';
 import { getServerSideSession } from '~/server/auth';
+import { Features } from '~/components/ui/landing-page/features';
 
 export default async function Home() {
     const session = await getServerSideSession();
 
     return (
         <>
-            <main className='flex min-h-screen flex-col items-center justify-center'>
-                <div className='container flex flex-col items-center justify-center gap-12 px-4 py-16'>
+            <main className='min-h-screen'>
+                <div className='container flex flex-col items-center justify-center gap-12 px-4 py-16 my-48 mx-auto'>
                     <div className='flex flex-col items-center gap-2'>
                         <p className='text-4xl font-extrabold'>
                             Chat with your notes.
@@ -38,6 +39,7 @@ export default async function Home() {
                         </p>
                     </div>
                 </div>
+                <Features />
             </main>
         </>
     );
