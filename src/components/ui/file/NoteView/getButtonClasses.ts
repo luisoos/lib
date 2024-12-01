@@ -13,7 +13,7 @@ export default function getButtonClasses(
             : '',
         floating
             ? 'rounded border bg-white p-0.5 mr-2 opacity-80 hover:opacity-100 hover:shadow-inner'
-            : 'h-8 px-2 py-0.5 hover:opacity-80',
+            : 'h-6 px-1 py-0.5 hover:opacity-80',
         'transition-all duration-100',
     );
 }

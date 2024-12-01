@@ -13,6 +13,7 @@ import {
 import { useCallback, useState } from 'react';
 import getButtonClasses from '~/components/ui/file/NoteView/getButtonClasses';
 import { cn } from '~/hooks/utils';
+import { HighlightDropdown } from './HighlightDropdown';
 
 const tableBoilerplate = `
   <table style="width:100%" class="not-prose">
@@ -73,7 +74,7 @@ export default function CompleteBubbleMenu({ editor }: { editor: Editor }) {
     return (
         <BubbleMenu
             className={cn(
-                'divide-x rounded border shadow-inner bg-white',
+                'h-7 divide-x rounded border shadow-inner bg-white',
                 editor.isActive('table') ? 'w-[19rem] px-auto' : '',
             )}
             tippyOptions={{ duration: 100 }}
@@ -88,7 +89,7 @@ export default function CompleteBubbleMenu({ editor }: { editor: Editor }) {
                     'bg-transparent border-none cursor-pointer',
                 )}>
                 <Bold
-                    size={20}
+                    size={16}
                     strokeWidth={isHovered ? '3' : '2'} // Change strokeWidth based on hover state
                     className={`transition-all duration-300`} // Tailwind for smooth transition
                 />
@@ -96,41 +97,12 @@ export default function CompleteBubbleMenu({ editor }: { editor: Editor }) {
             <button
                 onClick={() => editor.chain().focus().toggleItalic().run()}
                 className={getButtonClasses(editor, 'italic')}>
-                <Italic size={20} />
+                <Italic size={16} />
             </button>
             <button
                 onClick={() => editor.chain().focus().toggleStrike().run()}
                 className={getButtonClasses(editor, 'strike')}>
-                <Strikethrough size={20} />
-            </button>
-            {/* <button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>
-                        Insert table
-                        </button> */}
-            <button
-                onClick={() =>
-                    editor.isActive('subscript')
-                        ? editor.chain().focus().unsetSubscript().run()
-                        : editor.chain().focus().setSubscript().run()
-                }
-                className={cn(
-                    getButtonClasses(editor),
-                    editor.isActive('subscript') ? 'opacity-80' : '',
-                    'mt-0.5',
-                )}>
-                <Subscript size={20} />
-            </button>
-            <button
-                onClick={() =>
-                    editor.isActive('superscript')
-                        ? editor.chain().focus().setSuperscript().run()
-                        : editor.chain().focus().setSuperscript().run()
-                }
-                className={cn(
-                    getButtonClasses(editor),
-                    editor.isActive('superscript') ? 'opacity-80' : '',
-                    'mt-0.5',
-                )}>
-                <Superscript size={20} />
+                <Strikethrough size={16} />
             </button>
             <button
                 onClick={() =>
@@ -141,9 +113,36 @@ export default function CompleteBubbleMenu({ editor }: { editor: Editor }) {
                 className={cn(
                     getButtonClasses(editor),
                     editor.isActive('underline') ? 'opacity-80' : '',
-                    'mt-0.5',
+                    'my-0.5',
                 )}>
-                <Underline size={20} />
+                <Underline size={16} />
+            </button>
+            <HighlightDropdown editor={editor} />
+            <button
+                onClick={() =>
+                    editor.isActive('subscript')
+                        ? editor.chain().focus().unsetSubscript().run()
+                        : editor.chain().focus().setSubscript().run()
+                }
+                className={cn(
+                    getButtonClasses(editor),
+                    editor.isActive('subscript') ? 'opacity-80' : '',
+                    'my-0.5',
+                )}>
+                <Subscript size={16} />
+            </button>
+            <button
+                onClick={() =>
+                    editor.isActive('superscript')
+                        ? editor.chain().focus().setSuperscript().run()
+                        : editor.chain().focus().setSuperscript().run()
+                }
+                className={cn(
+                    getButtonClasses(editor),
+                    editor.isActive('superscript') ? 'opacity-80' : '',
+                    'my-0.5',
+                )}>
+                <Superscript size={16} />
             </button>
             <button
                 onClick={() =>
@@ -154,9 +153,9 @@ export default function CompleteBubbleMenu({ editor }: { editor: Editor }) {
                 className={cn(
                     getButtonClasses(editor),
                     editor.isActive('link') ? 'opacity-80' : '',
-                    'mt-0.5',
+                    'my-0.5',
                 )}>
-                <LinkIcon size={20} />
+                <LinkIcon size={16} />
             </button>
             <button
                 onClick={() =>
@@ -171,7 +170,7 @@ export default function CompleteBubbleMenu({ editor }: { editor: Editor }) {
                         .run()
                 }
                 className={getButtonClasses(editor)}>
-                <Table size={20} />
+                <Table size={16} strokeWidth={1.8} />
             </button>
             {editor.isActive('table') && (
                 <>

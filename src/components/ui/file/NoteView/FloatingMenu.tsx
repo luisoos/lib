@@ -4,6 +4,7 @@ import getButtonClasses from '~/components/ui/file/NoteView/getButtonClasses';
 import { HeadingDropdown } from '~/components/ui/file/NoteView/HeadingDropdown';
 
 import {
+    Bold,
     List,
     ListOrdered,
     Subscript,
@@ -27,6 +28,11 @@ export default function CompleteFloatingMenu({ editor }: { editor: Editor }) {
                 onClick={() => editor.chain().focus().toggleOrderedList().run()}
                 className={getButtonClasses(editor, 'orderedList', true)}>
                 <ListOrdered size={16} />
+            </button>
+            <button
+                onClick={() => editor.chain().focus().toggleBold().run()}
+                className={getButtonClasses(editor, 'bold', true)}>
+                <Bold size={16} />
             </button>
             <button
                 onClick={() => editor.chain().focus().toggleUnderline().run()}

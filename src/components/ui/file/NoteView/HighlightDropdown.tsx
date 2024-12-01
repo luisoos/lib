@@ -2,112 +2,63 @@
 
 import * as React from 'react';
 import { Editor } from '@tiptap/core';
+import { cn } from '~/hooks/utils';
 
 // TODO
 
+const colors: string[] = [
+    '#ffc078',
+    '#8ce99a',
+    '#74c0fc',
+    '#b197fc',
+];
+
+function getCurrentColor(editor: Editor) {
+    colors.forEach(color => {
+        if(editor.isActive('highlight', { color: color })) return color;
+    });
+    return false;
+}
+
+function Color({ className }: { className?: string }) {
+    return <div className={cn("w-4 h-4 mx-1 border rounded-full shadow-inner", className)}></div>
+}
+
+function NoColor({ className }: { className?: string }) {
+    return '/'
+}
+
 export function HighlightDropdown({ editor }: { editor: Editor }) {
+    const [dropdownState, setDropdownState] = React.useState(false);
     return (
         <>
             <button
-                onClick={() => editor.chain().focus().toggleHighlight().run()}
+                onClick={() => setDropdownState(true)}
                 className={editor.isActive('highlight') ? 'is-active' : ''}>
-                Toggle highlight
+                {getCurrentColor(editor) ? <Color className={`bg-${getCurrentColor(editor)}`} /> : <NoColor />}
             </button>
-            <button
-                onClick={() =>
-                    editor
-                        .chain()
-                        .focus()
-                        .toggleHighlight({ color: '#ffc078' })
-                        .run()
-                }
-                className={
-                    editor.isActive('highlight', { color: '#ffc078' })
-                        ? 'is-active'
-                        : ''
-                }>
-                Orange
-            </button>
-            <button
-                onClick={() =>
-                    editor
-                        .chain()
-                        .focus()
-                        .toggleHighlight({ color: '#8ce99a' })
-                        .run()
-                }
-                className={
-                    editor.isActive('highlight', { color: '#8ce99a' })
-                        ? 'is-active'
-                        : ''
-                }>
-                Green
-            </button>
-            <button
-                onClick={() =>
-                    editor
-                        .chain()
-                        .focus()
-                        .toggleHighlight({ color: '#74c0fc' })
-                        .run()
-                }
-                className={
-                    editor.isActive('highlight', { color: '#74c0fc' })
-                        ? 'is-active'
-                        : ''
-                }>
-                Blue
-            </button>
-            <button
-                onClick={() =>
-                    editor
-                        .chain()
-                        .focus()
-                        .toggleHighlight({ color: '#b197fc' })
-                        .run()
-                }
-                className={
-                    editor.isActive('highlight', { color: '#b197fc' })
-                        ? 'is-active'
-                        : ''
-                }>
-                Purple
-            </button>
-            <button
-                onClick={() =>
-                    editor
-                        .chain()
-                        .focus()
-                        .toggleHighlight({ color: 'red' })
-                        .run()
-                }
-                className={
-                    editor.isActive('highlight', { color: 'red' })
-                        ? 'is-active'
-                        : ''
-                }>
-                Red ('red')
-            </button>
-            <button
-                onClick={() =>
-                    editor
-                        .chain()
-                        .focus()
-                        .toggleHighlight({ color: '#ffa8a8' })
-                        .run()
-                }
-                className={
-                    editor.isActive('highlight', { color: '#ffa8a8' })
-                        ? 'is-active'
-                        : ''
-                }>
-                Red (#ffa8a8)
-            </button>
+            {dropdownState && <div className={cn("absolute")}><>{colors.map((color) => {
+                <button
+                    onClick={() =>
+                        editor
+                            .chain()
+                            .focus()
+                            .toggleHighlight({ color: color })
+                            .run()
+                    }
+                    className={
+                        editor.isActive('highlight', { color: color })
+                            ? 'is-active'
+                            : ''
+                    }>
+                    <Color className={`bg-${color}`} />
+                </button>
+            })}</>
             <button
                 onClick={() => editor.chain().focus().unsetHighlight().run()}
                 disabled={!editor.isActive('highlight')}>
-                Unset highlight
-            </button>
+                <NoColor />
+            </button></div> }
         </>
     );
 }
