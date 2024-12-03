@@ -7,8 +7,6 @@ import { Circle, CircleSlash } from 'lucide-react';
 import getButtonClasses from './getButtonClasses';
 import { motion } from 'framer-motion';
 
-// TODO
-
 const colors: string[] = ['#ffc078', '#8ce99a', '#74c0fc', '#b197fc'];
 
 function getCurrentColor(editor: Editor) {
