@@ -4,9 +4,12 @@ import { UploadCloud } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import { Heading, Subheading, Title } from '~/components/ui/dashboard/heading';
-import { Skeleton2 } from '~/components/ui/skeleton';
+import { Skeleton3 } from '~/components/ui/skeleton';
+import { useToast } from '~/hooks/use-toast';
 
 export default function Page() {
+    const { toast } = useToast();
+
     const [uploadSecret, setUploadSecret] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -35,12 +38,49 @@ export default function Page() {
         });
 
         if (!response.ok) {
-            throw new Error('Failed to generate upload secret');
+            toast({
+                variant: 'destructive',
+                title: 'Failed to generate upload secret.',
+            });
         }
 
         const responseData = await response.json();
         setUploadSecret(responseData.data.secret);
         setLoading(false);
+    };
+
+    const handleDelete = async () => {
+        const response = await fetch(`/api/routes/user/uploadsecret`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            toast({
+                variant: 'destructive',
+                title: 'Failed to delete upload secret.',
+            });
+        }
+
+        setUploadSecret(null);
+        setLoading(false);
+    };
+
+    const copyToClipboard = async () => {
+        if (!uploadSecret) return;
+        try {
+            await navigator.clipboard.writeText(uploadSecret);
+            toast({
+                title: 'Copied upload secret to your clipboard!',
+            });
+        } catch (err) {
+            toast({
+                variant: 'destructive',
+                title: 'Failed to copy upload secret.',
+            });
+        }
     };
 
     return (
@@ -54,12 +94,15 @@ export default function Page() {
                     Generate an upload secret and configuration files for ShareX
                     upload.
                 </Subheading>
-                <div className='mt-2 w-full'>
+                <div className='mt-2 mb-1 w-full'>
                     {!loading ? (
                         <>
                             {uploadSecret ? (
-                                /* TODO: Onclick: copy to clipboard */
-                                <p className='pb-4 break-all blur-sm hover:blur-none'>
+                                <p
+                                    className='mb-4 cursor-pointer break-all blur-sm hover:blur-none transition-all'
+                                    onClick={async () =>
+                                        await copyToClipboard()
+                                    }>
                                     {uploadSecret}
                                 </p>
                             ) : (
@@ -68,17 +111,37 @@ export default function Page() {
                                     moment.
                                 </p>
                             )}
-                            <Button
-                                type='button'
-                                onClick={async () => {
-                                    await handleGenerate();
-                                }}>
-                                {uploadSecret ? 'Regenerate' : 'Generate'}
-                                {/* TODO: add delete button */}
-                            </Button>
+                            <div className='flex'>
+                                <Button
+                                    type='button'
+                                    onClick={async () => {
+                                        await handleGenerate();
+                                    }}>
+                                    {uploadSecret
+                                        ? 'Regenerate Secret'
+                                        : 'Generate Secret'}
+                                </Button>
+                                {uploadSecret && (
+                                    <Button
+                                        type='button'
+                                        variant='destructive'
+                                        className='ml-2'
+                                        onClick={async () => {
+                                            await handleDelete();
+                                        }}>
+                                        Delete Secret
+                                    </Button>
+                                )}
+                            </div>
                         </>
                     ) : (
-                        <></>
+                        <>
+                            <Skeleton3 />
+                            <div className='flex mt-2'>
+                                <Skeleton3 className='h-8 w-24' />
+                                <Skeleton3 className='ml-2 h-8 w-24' />
+                            </div>
+                        </>
                     )}
                 </div>
             </div>

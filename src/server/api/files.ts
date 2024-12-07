@@ -8,6 +8,7 @@ import { validateFileOwnership } from '~/server/api/shared/validateFileOwnership
 import { FileContentOrSignedUrl, Metadata } from '~/types/files/db';
 import { ServerActionResponse, UploadData } from '~/types/api/response';
 import { FileObject, StorageError } from '@supabase/storage-js';
+import { getUserByUploadSecret } from './uploadsecret';
 
 export async function getStructure(): Promise<
     ServerActionResponse<ExtendedFileObject[]>
@@ -210,6 +211,53 @@ export async function uploadFile(
     return { data, error, status: 200 };
 }
 
+// Function to upload a file from a uploader
+export async function uploadFileFromUploader(
+    file: File,
+    uploadSecret: string,
+): Promise<{ uploadedFileName: string; fileUrl: string }> {
+    const uploadFolerName: string = 'uploads';
+
+    // Get supabase client and parameters
+    const supabase = createClient();
+
+    // Get user by upload secret
+    const userId = getUserByUploadSecret(uploadSecret);
+
+    // Set folder
+    const folder: string = uploadFolerName + '/';
+
+    // Get file data as text
+    const fileData = await readFileAsText(file);
+
+    // Create timestamp so that the file name is unqiue
+    const timestamp = new Date().toISOString().replace(/[:.-]/g, '');
+
+    // Generate file name and file path
+    const generatedFileName = `${timestamp}_${file.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`;
+    const filePath = `${userId}/${folder}/${generatedFileName}`;
+
+    const { data, error } = await supabase.storage
+        .from(env.SUPABASE_BUCKET_NAME)
+        .upload(filePath, fileData, {
+            contentType: file.type,
+            upsert: false,
+        });
+
+    if (error) throw error;
+
+    const { data: signedUrl, error: storageError } = await supabase.storage
+        .from(env.SUPABASE_BUCKET_NAME)
+        .createSignedUrl(filePath, 60);
+
+    if (storageError) throw storageError;
+
+    return {
+        uploadedFileName: generatedFileName,
+        fileUrl: signedUrl.signedUrl,
+    };
+}
+
 // Function to update a file
 export async function updateNote(
     fileName: string,
@@ -394,4 +442,18 @@ async function getPathTokens(
     }
 
     return data?.path_tokens; // Return only the path_tokens field or undefined if not found
+}
+
+function readFileAsText(file: File): Promise<string> {
+    const fileReader = new FileReader();
+    return new Promise((resolve, reject) => {
+        fileReader.onload = () => {
+            const fileContent = fileReader.result as string; // Read content as string
+            resolve(fileContent); // Resolve with file content
+        };
+        fileReader.onerror = (error) => {
+            reject(error); // Reject on error
+        };
+        fileReader.readAsText(file); // Read the file as text
+    });
 }

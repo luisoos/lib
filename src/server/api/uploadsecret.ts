@@ -20,6 +20,23 @@ export async function getUploadSecret(): Promise<
     return { data: uploadSecret, error: null, status: 200 };
 }
 
+export async function getUserByUploadSecret(
+    uploadSecret: string,
+): Promise<ServerActionResponse<typeof uploadSecret>> {
+    const user = await getProfile();
+    if (!user) return { data: null, error: 'Unauthorized', status: 401 };
+    const userId = user.id;
+
+    const secret = await db.uploadSecret.findUnique({
+        where: {
+            secret: uploadSecret,
+        },
+    });
+
+    if (!secret) return { data: null, error: 'Not found', status: 404 };
+    return { data: secret.userId, error: null, status: 200 };
+}
+
 export async function generateUploadSecret(): Promise<
     ServerActionResponse<typeof uploadSecret>
 > {
