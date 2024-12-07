@@ -6,6 +6,7 @@ import {
     ChevronsUpDown,
     CreditCard,
     LogOut,
+    Settings,
     Sparkles,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -108,27 +109,30 @@ export function NavUser({
                                 <BadgeCheck />
                                 Account
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            {/* <DropdownMenuItem>
                                 <CreditCard />
                                 Billing
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Bell />
-                                Notifications
+                            </DropdownMenuItem> */}
+                            <DropdownMenuItem asChild>
+                                <Link
+                                    className='cursor-pointer'
+                                    href='/dashboard/settings'>
+                                    <Settings />
+                                    Settings
+                                </Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
                             <LogOut />
-                            <Button
-                                variant='link'
+                            <button
                                 onClick={() =>
                                     signOut({
                                         callbackUrl: '/auth/signin',
                                     })
                                 }>
                                 Log out
-                            </Button>
+                            </button>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

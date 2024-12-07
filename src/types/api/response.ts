@@ -10,8 +10,10 @@ type ErrorStrings =
     | '`fileData` is undefined and the `fileName` is the same'
     | 'File should only be renamed but could not be retrieved'
     | 'Internal error while preparing Supabase transaction'
+    | 'Internal error'
     | 'There already is a resource at given file path'
-    | 'Could not find file or corresponding path';
+    | 'Could not find file or corresponding path'
+    | 'Failed to delete upload secret';
 
 export type ServerActionResponse<DataType> = {
     data: null | DataType;
