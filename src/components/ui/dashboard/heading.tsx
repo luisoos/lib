@@ -54,9 +54,5 @@ export function Description({
     className?: string;
     children: ReactNode;
 }) {
-    return (
-        <h2 className={cn(className, 'flex items-center text-md')}>
-            {children}
-        </h2>
-    );
+    return <h2 className={cn(className, 'text-md')}>{children}</h2>;
 }

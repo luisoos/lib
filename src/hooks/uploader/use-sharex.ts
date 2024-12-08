@@ -14,6 +14,8 @@ export default function useShareX(uploadsecret: string) {
                 Authorization: `Bearer ${uploadsecret}`,
             },
             FileFormName: 'd',
+            TextFormName: 'text',
+            ClipboardUploadEnabled: true,
         },
         null,
         2,

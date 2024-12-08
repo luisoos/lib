@@ -10,10 +10,10 @@ import {
     Title,
 } from '~/components/ui/dashboard/heading';
 import { Skeleton3 } from '~/components/ui/skeleton';
-import useShareX from '~/hooks/uploader/use-sharex';
 import { useToast } from '~/hooks/use-toast';
 import { Slider } from '~/components/ui/slider';
 import { Label } from '~/components/ui/label';
+import useShareX from '~/hooks/uploader/use-sharex';
 
 export default function Page() {
     const { toast } = useToast();
@@ -106,6 +106,10 @@ export default function Page() {
                 expiration: expiration,
             }),
         });
+        toast({
+            title: `Set your link expiration to ${expiration / 60} minutes!`,
+            description: 'You do not need to download your config again.',
+        });
 
         if (!response.ok) {
             toast({
@@ -121,6 +125,7 @@ export default function Page() {
             await navigator.clipboard.writeText(uploadSecret);
             toast({
                 title: 'Copied upload secret to your clipboard!',
+                description: 'Make sure to keep it secure and do not share it.',
             });
         } catch (err) {
             toast({
@@ -131,72 +136,18 @@ export default function Page() {
     };
 
     return (
-        <>
+        <div className='w-11/12 md:max-w-2xl mx-auto md:pr-16 max-md:mr-6 hyphens-auto'>
             <Title>Settings</Title>
-            <div className='max-w-2xl pt-2'>
+            <div className='mt-2'>
                 <Heading>
                     <UploadCloud size={20} className='mr-2' /> Uploader Settings
                 </Heading>
-                <Subheading>
-                    <FileKey2 size={16} className='mr-2' /> Upload Secret
-                </Subheading>
-                <Description>
-                    Generate an upload secret and configuration files for ShareX
-                    upload.
-                </Description>
-                <div className='mt-2 mb-1 w-full'>
-                    {!loading ? (
-                        <>
-                            {uploadSecret ? (
-                                <p
-                                    className='mb-4 cursor-pointer break-all blur-sm hover:blur-none transition-all'
-                                    onClick={async () =>
-                                        await copyToClipboard()
-                                    }>
-                                    {uploadSecret}
-                                </p>
-                            ) : (
-                                <p className='text-zinc-600'>
-                                    You do not have an upload secret at the
-                                    moment.
-                                </p>
-                            )}
-                            <div className='flex'>
-                                <Button
-                                    type='button'
-                                    onClick={async () => {
-                                        await handleGenerate();
-                                    }}>
-                                    {uploadSecret
-                                        ? 'Regenerate Secret'
-                                        : 'Generate Secret'}
-                                </Button>
-                                {uploadSecret && (
-                                    <Button
-                                        type='button'
-                                        variant='destructive'
-                                        className='ml-2'
-                                        onClick={async () => {
-                                            await handleDelete();
-                                        }}>
-                                        Delete Secret
-                                    </Button>
-                                )}
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <Skeleton3 />
-                            <div className='flex mt-2'>
-                                <Skeleton3 className='h-8 w-24' />
-                                <Skeleton3 className='ml-2 h-8 w-24' />
-                            </div>
-                        </>
-                    )}
-                </div>
-                <Subheading className='mt-4'>
-                    <ImageUp size={16} className='mr-2' /> Download ShareX
-                    Configuration
+                <Subheading className='mt-2'>
+                    <ImageUp
+                        size={16}
+                        className='mr-2 max-sm:mt-1.5 max-sm:mb-auto'
+                    />{' '}
+                    Download ShareX Configuration
                 </Subheading>
                 <Description>
                     Download a ShareX configuration file (.sxcu) to upload
@@ -211,7 +162,7 @@ export default function Page() {
                     Download Config
                 </Button>
                 <div className={!uploadSecret ? 'opacity-60' : ''}>
-                    <Subheading className='mt-4'>
+                    <Subheading className='mt-6'>
                         <TimerReset size={16} className='mr-2' /> Link
                         Expiration
                     </Subheading>
@@ -253,7 +204,67 @@ export default function Page() {
                         </Label>
                     </div>
                 </div>
+                <Subheading className='mt-6'>
+                    <FileKey2 size={16} className='mr-2' /> Upload Secret
+                </Subheading>
+                <Description>
+                    Generate an upload secret and configuration files for ShareX
+                    upload. <br />{' '}
+                    <span className='text-red-600'>
+                        Keep it secure and do not share it.
+                    </span>
+                </Description>
+                <div className='mt-2 mb-1 w-full'>
+                    {!loading ? (
+                        <>
+                            {uploadSecret ? (
+                                <p
+                                    className='p-2 rounded border shadow-inner cursor-pointer break-all blur-sm hover:blur-none transition-all'
+                                    onClick={async () =>
+                                        await copyToClipboard()
+                                    }>
+                                    {uploadSecret}
+                                </p>
+                            ) : (
+                                <p className='text-zinc-600'>
+                                    You do not have an upload secret at the
+                                    moment.
+                                </p>
+                            )}
+                            <div className='mt-2 flex'>
+                                <Button
+                                    type='button'
+                                    onClick={async () => {
+                                        await handleGenerate();
+                                    }}>
+                                    {uploadSecret
+                                        ? 'Regenerate Secret'
+                                        : 'Generate Secret'}
+                                </Button>
+                                {uploadSecret && (
+                                    <Button
+                                        type='button'
+                                        variant='destructive'
+                                        className='ml-2'
+                                        onClick={async () => {
+                                            await handleDelete();
+                                        }}>
+                                        Delete Secret
+                                    </Button>
+                                )}
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <Skeleton3 />
+                            <div className='flex mt-2'>
+                                <Skeleton3 className='h-8 w-24' />
+                                <Skeleton3 className='ml-2 h-8 w-24' />
+                            </div>
+                        </>
+                    )}
+                </div>
             </div>
-        </>
+        </div>
     );
 }
