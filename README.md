@@ -2,7 +2,8 @@
 
 Chat with all of your documents at once. Perfect for school & university.
 
-> [!NOTE] > `/lib` is a web-based SaaS that lets users use huge context-aware vector AI.
+> [!NOTE] 
+> `/lib` is a web-based SaaS that lets users use huge context-aware vector AI.
 
 ## Tech Stack
 
