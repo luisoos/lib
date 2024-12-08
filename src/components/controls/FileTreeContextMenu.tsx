@@ -1,6 +1,7 @@
 'use client';
 
 import { ToastAction } from '@radix-ui/react-toast';
+import { useQueryClient } from '@tanstack/react-query';
 import { redirect, usePathname, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
@@ -19,6 +20,7 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
     className,
     children,
 }) => {
+    const queryClient = useQueryClient();
     const { toast } = useToast();
     const router = useRouter();
 
@@ -53,6 +55,9 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
                             const redirect: boolean = Boolean(
                                 item.id && pathname.includes(item.id),
                             );
+                            queryClient.invalidateQueries({
+                                queryKey: ['sidebar'],
+                            });
                             toast({
                                 title: 'Deleted succesfully.',
                                 description: `We successfully deleted the requested file. ${redirect && 'You will be redirected to the dashboard now.'}`,

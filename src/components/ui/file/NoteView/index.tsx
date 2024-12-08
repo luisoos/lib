@@ -257,7 +257,6 @@ export default ({
 
                 if (json.data) {
                     if (json.data.revalidate === 'sidebar') {
-                        console.log('test');
                         queryClient.invalidateQueries({
                             queryKey: ['sidebar'],
                         });
