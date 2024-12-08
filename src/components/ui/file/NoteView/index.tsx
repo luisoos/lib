@@ -77,7 +77,6 @@ export default ({
             TableHeader,
             TableCell,
             Highlight,
-            Typography,
             Bold,
             Italic,
             Strike,

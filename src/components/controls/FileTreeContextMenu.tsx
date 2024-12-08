@@ -25,7 +25,6 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
     const pathname = usePathname();
 
     const handleNewNoteClick = async () => {
-        console.log('Button was clicked!', item?.id);
         const file = new File([''], 'New Note.txt', {
             type: 'text/plain',
         });
@@ -51,14 +50,16 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
                         const json = await response.json();
 
                         if (response.ok) {
+                            const redirect: boolean = Boolean(
+                                item.id && pathname.includes(item.id),
+                            );
                             toast({
                                 title: 'Deleted succesfully.',
-                                description:
-                                    'We successfully deleted the requested file. You will be redirected to the dashboard now.',
+                                description: `We successfully deleted the requested file. ${redirect && 'You will be redirected to the dashboard now.'}`,
                             });
-                            if (item.id && pathname.includes(item.id)) {
+                            if (redirect) {
                                 setTimeout(() => {
-                                    router.push(`/dashboard`);
+                                    router.replace(`/dashboard`);
                                 }, 5000);
                             }
                         } else {

@@ -1,16 +1,25 @@
 'use client';
 
-import { UploadCloud } from 'lucide-react';
+import { FileKey2, ImageUp, TimerReset, UploadCloud } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
-import { Heading, Subheading, Title } from '~/components/ui/dashboard/heading';
+import {
+    Description,
+    Heading,
+    Subheading,
+    Title,
+} from '~/components/ui/dashboard/heading';
 import { Skeleton3 } from '~/components/ui/skeleton';
+import useShareX from '~/hooks/uploader/use-sharex';
 import { useToast } from '~/hooks/use-toast';
+import { Slider } from '~/components/ui/slider';
+import { Label } from '~/components/ui/label';
 
 export default function Page() {
     const { toast } = useToast();
 
     const [uploadSecret, setUploadSecret] = useState<string | null>(null);
+    const [expiration, setExpiration] = useState<number>(60);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -21,6 +30,7 @@ export default function Page() {
                 const responseData = await response.json();
                 console.log(responseData);
                 setUploadSecret(responseData.data.secret);
+                setExpiration(responseData.data.urlExpires);
             }
             setLoading(false);
         };
@@ -47,6 +57,7 @@ export default function Page() {
         const responseData = await response.json();
         setUploadSecret(responseData.data.secret);
         setLoading(false);
+        return uploadSecret;
     };
 
     const handleDelete = async () => {
@@ -68,6 +79,42 @@ export default function Page() {
         setLoading(false);
     };
 
+    const downloadUploaderConfig = async () => {
+        if (!uploadSecret) await handleGenerate();
+        // Generate ShareX config
+        const config = useShareX(uploadSecret!);
+        // Generate a blob from it and create a object url; download it
+        const blob = new Blob([config], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'sharex_uploader.sxcu';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+
+    const handleExpirationUpdate = async () => {
+        if (!uploadSecret) return;
+        const response = await fetch(`/api/routes/user/uploadsecret`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                expiration: expiration,
+            }),
+        });
+
+        if (!response.ok) {
+            toast({
+                variant: 'destructive',
+                title: 'Failed to update expiration.',
+            });
+        }
+    };
+
     const copyToClipboard = async () => {
         if (!uploadSecret) return;
         try {
@@ -86,14 +133,17 @@ export default function Page() {
     return (
         <>
             <Title>Settings</Title>
-            <div className='max-w-2xl p-4 rounded border shadow-inner'>
+            <div className='max-w-2xl pt-2'>
                 <Heading>
                     <UploadCloud size={20} className='mr-2' /> Uploader Settings
                 </Heading>
                 <Subheading>
+                    <FileKey2 size={16} className='mr-2' /> Upload Secret
+                </Subheading>
+                <Description>
                     Generate an upload secret and configuration files for ShareX
                     upload.
-                </Subheading>
+                </Description>
                 <div className='mt-2 mb-1 w-full'>
                     {!loading ? (
                         <>
@@ -143,6 +193,65 @@ export default function Page() {
                             </div>
                         </>
                     )}
+                </div>
+                <Subheading className='mt-4'>
+                    <ImageUp size={16} className='mr-2' /> Download ShareX
+                    Configuration
+                </Subheading>
+                <Description>
+                    Download a ShareX configuration file (.sxcu) to upload
+                    images and text to your workspace.
+                </Description>
+                <Button
+                    type='button'
+                    className='mt-2'
+                    onClick={async () => {
+                        await downloadUploaderConfig();
+                    }}>
+                    Download Config
+                </Button>
+                <div className={!uploadSecret ? 'opacity-60' : ''}>
+                    <Subheading className='mt-4'>
+                        <TimerReset size={16} className='mr-2' /> Link
+                        Expiration
+                    </Subheading>
+                    <Description>
+                        For enhanced privacy, the URL you get when uploading
+                        using ShareX does not work forever. You may change this
+                        setting here.
+                    </Description>
+                    <Label className='mt-2' htmlFor='slider'>
+                        Expiration in minutes ({expiration / 60} mins)
+                    </Label>
+                    <Slider
+                        disabled={uploadSecret ? false : true}
+                        className='mt-2'
+                        onValueChange={
+                            (value: number[]) =>
+                                setExpiration(
+                                    (value[0] || 1) * 60,
+                                ) /* Calculate numbers to seconds */
+                        }
+                        onValueCommit={async () => {
+                            await handleExpirationUpdate();
+                        }}
+                        defaultValue={[1]}
+                        value={[expiration / 60]}
+                        min={1}
+                        max={30}
+                        step={1}
+                    />
+                    <div className='flex justify-between'>
+                        <Label className='mt-2' htmlFor='slider'>
+                            1 minute
+                        </Label>
+                        <Label className='mt-2' htmlFor='slider'>
+                            15 minutes
+                        </Label>
+                        <Label className='mt-2' htmlFor='slider'>
+                            30 minutes
+                        </Label>
+                    </div>
                 </div>
             </div>
         </>

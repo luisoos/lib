@@ -27,13 +27,27 @@ export function Heading({
     children: ReactNode;
 }) {
     return (
-        <h2 className={cn(className, 'flex items-center font-normal text-xl')}>
+        <h2 className={cn(className, 'flex items-center font-medium text-xl')}>
             {children}
         </h2>
     );
 }
 
 export function Subheading({
+    className,
+    children,
+}: {
+    className?: string;
+    children: ReactNode;
+}) {
+    return (
+        <h2 className={cn(className, 'flex items-center font-normal text-lg')}>
+            {children}
+        </h2>
+    );
+}
+
+export function Description({
     className,
     children,
 }: {

@@ -11,4 +11,8 @@ export interface Metadata {
 export type FileContentOrSignedUrl = fileContentData | SignedUrlData | null;
 
 type fileContentData = { fileContent: string; metadata: Record<string, any> };
-type SignedUrlData = { signedUrl: string; metadata: Record<string, any> };
+type SignedUrlData = {
+    signedUrl: string;
+    fileName: string;
+    metadata: Record<string, any>;
+};

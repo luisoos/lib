@@ -11,6 +11,9 @@ const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
     const [fileData, setFileData] = useState<string | undefined>(undefined);
     const [fileName, setFileName] = useState<string | undefined>(undefined);
     const [fileType, setFileType] = useState<string | undefined>(undefined);
+    const [lastModified, setLastModified] = useState<Date | undefined>(
+        undefined,
+    );
 
     useEffect(() => {
         const fetchFile = async () => {
@@ -21,6 +24,7 @@ const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
                 setFileData(data.data.fileContent ?? data.data.signedUrl);
                 setFileName(data.data.fileName);
                 setFileType(data.data.mimetype);
+                setLastModified(new Date(data.data.lastModified));
             } else {
                 console.error('Failed to fetch file');
             }
@@ -35,7 +39,8 @@ const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
                 fileId={slug}
                 file={fileData!}
                 fileType={fileType!}
-                fileName={fileName}
+                fileName={fileName!}
+                lastModified={lastModified!}
             />
         );
     } else {

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { DocumentView } from '~/components/ui/file/DocumentView';
 import ImageView from '~/components/ui/file/ImageView';
 import NoteView from '~/components/ui/file/NoteView';
 const PDFView = dynamic(() => import('~/components/ui/file/PDFView'), {
@@ -13,8 +12,9 @@ const View: React.FC<{
     fileId: string;
     file: string;
     fileType: string;
-    fileName?: string;
-}> = ({ file, fileType, fileName, fileId }) => {
+    fileName: string;
+    lastModified: Date;
+}> = ({ file, fileType, fileName, fileId, lastModified }) => {
     const [fileContent, setFileContent] = useState<string | null>(null);
 
     useEffect(() => {
@@ -42,7 +42,14 @@ const View: React.FC<{
             />
         );
     } else if (fileType.startsWith('image/')) {
-        return <ImageView content={fileContent} />;
+        return (
+            <ImageView
+                content={fileContent}
+                fileType={fileType}
+                fileName={fileName}
+                lastModified={lastModified}
+            />
+        );
     } else if (fileType.startsWith('application/pdf')) {
         return <PDFView fileId={fileId} pdfUrl={file} />;
     } else {

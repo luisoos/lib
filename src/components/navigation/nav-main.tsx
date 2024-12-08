@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
     Collapsible,
@@ -47,11 +47,15 @@ export function NavMain({
                 <SidebarMenu>
                     {items.map((item) => {
                         item.isActive = pathname === getFileUrl(item.url);
+                        const [open, setOpen] = useState<boolean>(
+                            item.isActive,
+                        );
                         return !item.url ? (
                             <Collapsible
                                 key={item.title + item.items?.length}
                                 asChild
-                                defaultOpen={item.isActive}
+                                open={open}
+                                onClick={() => setOpen(!open)}
                                 className='group/collapsible'>
                                 <SidebarMenuItem>
                                     <CollapsibleTrigger asChild>

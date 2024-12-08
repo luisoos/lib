@@ -22,11 +22,7 @@ export async function getUploadSecret(): Promise<
 
 export async function getUserByUploadSecret(
     uploadSecret: string,
-): Promise<ServerActionResponse<typeof uploadSecret>> {
-    const user = await getProfile();
-    if (!user) return { data: null, error: 'Unauthorized', status: 401 };
-    const userId = user.id;
-
+): Promise<ServerActionResponse<{ userId: string; urlExpiresIn: number }>> {
     const secret = await db.uploadSecret.findUnique({
         where: {
             secret: uploadSecret,
@@ -34,7 +30,11 @@ export async function getUserByUploadSecret(
     });
 
     if (!secret) return { data: null, error: 'Not found', status: 404 };
-    return { data: secret.userId, error: null, status: 200 };
+    return {
+        data: { userId: secret.userId, urlExpiresIn: secret.urlExpires },
+        error: null,
+        status: 200,
+    };
 }
 
 export async function generateUploadSecret(): Promise<
@@ -77,6 +77,25 @@ export async function deleteUploadSecret(): Promise<
             status: 500,
         };
     }
+}
+
+export async function updateExpiration(
+    expiration: number,
+): Promise<ServerActionResponse<number>> {
+    const user = await getProfile();
+    if (!user) return { data: null, error: 'Unauthorized', status: 401 };
+    const userId = user.id;
+
+    const updatedSecret = await db.uploadSecret.update({
+        where: {
+            userId: userId,
+        },
+        data: {
+            urlExpires: expiration,
+        },
+    });
+
+    return { data: updatedSecret.urlExpires, error: null, status: 200 };
 }
 
 async function findAndDeleteUploadSecret(userId: string) {

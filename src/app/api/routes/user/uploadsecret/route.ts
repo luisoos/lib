@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import {
     deleteUploadSecret,
     generateUploadSecret,
     getUploadSecret,
+    updateExpiration,
 } from '~/server/api/uploadsecret';
+
+const expirationUpdateSchema = z.object({
+    expiration: z.number(),
+});
 
 /**
  * API Endpoint to retrieve the upload secret for the authenticated user
@@ -30,7 +36,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         return NextResponse.json({ error: 'Not found' }, { status: 404 });
     }
 
-    return NextResponse.json(uploadSecret, { status: 200 });
+    return NextResponse.json(uploadSecret);
 }
 
 /**
@@ -54,7 +60,46 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         // Attempt to delete any existing upload secret before creating a new one
         const uploadSecret = await generateUploadSecret();
 
-        return NextResponse.json(uploadSecret, { status: 201 });
+        return NextResponse.json(uploadSecret);
+    } catch (error) {
+        console.error('Error generating upload secret:', error);
+        return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+    }
+}
+
+/**
+ * API Endpoint to update the expiration of the file url in seconds.
+ *
+ * This function handles PATCH requests to update the expiration seconds.
+ *
+ * @async
+ * @function PATCH
+ * @returns {Promise<NextResponse>} A promise that resolves to a NextResponse object
+ *
+ * @example
+ * // Example usage in a client-side fetch:
+ * fetch('/api/routes/user/uploadsecret', {
+ *   method: 'PATCH',
+ *   headers: {
+ *     'Content-Type': 'application/json',
+ *   },
+ *   body: JSON.stringify({
+ *      expiration: expiration
+ *   }),
+ * })
+ *   .then(response => response.json())
+ *   .then(uploadSecret => console.log(uploadSecret))
+ *   .catch(error => console.error('Failed to generate upload secret:', error));
+ */
+export async function PATCH(request: NextRequest): Promise<NextResponse> {
+    try {
+        const body = await request.json(); // Parse the JSON body of the request
+
+        const parsedData = expirationUpdateSchema.parse(body);
+
+        const uploadSecret = await updateExpiration(parsedData.expiration);
+
+        return NextResponse.json(uploadSecret);
     } catch (error) {
         console.error('Error generating upload secret:', error);
         return NextResponse.json({ error: 'Internal error' }, { status: 500 });

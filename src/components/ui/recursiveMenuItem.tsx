@@ -15,7 +15,7 @@ const RecursiveMenuItem: React.FC<{ item: NavMainItem; path: string }> = ({
     path,
 }) => {
     const pathname = usePathname();
-    const isDashboard = pathname.startsWith('/dashboard');
+    const isDashboard = pathname === '/dashboard';
     const id: string = `${path}/${item.url ?? item.title}`;
     return (
         <FileTreeContextMenu item={item}>

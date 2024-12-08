@@ -76,12 +76,13 @@ model User {
 }
 
 model UploadSecret {
-    id        String   @id @default(uuid())
-    secret    String   @unique
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    userId    String   @unique
-    user      User     @relation(fields: [userId], references: [id])
+    id         String   @id @default(uuid())
+    secret     String   @unique
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    userId     String   @unique
+    urlExpires Int      @default(300)
+    user       User     @relation(fields: [userId], references: [id])
 
     @@schema("public")
 }

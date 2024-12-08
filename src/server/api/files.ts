@@ -79,6 +79,7 @@ export async function getFileById(
             error: 'Unauthorized',
             status: 401,
         };
+
     const validation = await validateFileOwnership(supabase, fileId, user.id);
 
     if (!validation)
@@ -149,6 +150,7 @@ export async function getFileById(
 
         data = {
             signedUrl: signedUrl.signedUrl,
+            fileName: objectData.path_tokens[objectData.path_tokens.length - 1],
             ...objectData.metadata,
         };
     }
@@ -213,8 +215,10 @@ export async function uploadFile(
 
 // Function to upload a file from a uploader
 export async function uploadFileFromUploader(
-    file: File,
+    file: Buffer,
     uploadSecret: string,
+    fileName: string,
+    fileType: string,
 ): Promise<{ uploadedFileName: string; fileUrl: string }> {
     const uploadFolerName: string = 'uploads';
 
@@ -222,25 +226,25 @@ export async function uploadFileFromUploader(
     const supabase = createClient();
 
     // Get user by upload secret
-    const userId = getUserByUploadSecret(uploadSecret);
+    const user = await getUserByUploadSecret(uploadSecret);
+    if (!user.data)
+        throw new Error('Upload secret invalid or does not match our records.');
+    const userId = user.data.userId;
 
     // Set folder
     const folder: string = uploadFolerName + '/';
-
-    // Get file data as text
-    const fileData = await readFileAsText(file);
 
     // Create timestamp so that the file name is unqiue
     const timestamp = new Date().toISOString().replace(/[:.-]/g, '');
 
     // Generate file name and file path
-    const generatedFileName = `${timestamp}_${file.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`;
+    const generatedFileName = `${timestamp}_${fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`;
     const filePath = `${userId}/${folder}/${generatedFileName}`;
 
     const { data, error } = await supabase.storage
         .from(env.SUPABASE_BUCKET_NAME)
-        .upload(filePath, fileData, {
-            contentType: file.type,
+        .upload(filePath, file, {
+            contentType: fileType,
             upsert: false,
         });
 
@@ -248,7 +252,7 @@ export async function uploadFileFromUploader(
 
     const { data: signedUrl, error: storageError } = await supabase.storage
         .from(env.SUPABASE_BUCKET_NAME)
-        .createSignedUrl(filePath, 60);
+        .createSignedUrl(filePath, user.data.urlExpiresIn);
 
     if (storageError) throw storageError;
 
@@ -442,18 +446,4 @@ async function getPathTokens(
     }
 
     return data?.path_tokens; // Return only the path_tokens field or undefined if not found
-}
-
-function readFileAsText(file: File): Promise<string> {
-    const fileReader = new FileReader();
-    return new Promise((resolve, reject) => {
-        fileReader.onload = () => {
-            const fileContent = fileReader.result as string; // Read content as string
-            resolve(fileContent); // Resolve with file content
-        };
-        fileReader.onerror = (error) => {
-            reject(error); // Reject on error
-        };
-        fileReader.readAsText(file); // Read the file as text
-    });
 }
