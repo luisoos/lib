@@ -253,15 +253,16 @@ export default ({
                     });
                 }
 
-                console.log(json);
-
                 if (json.data) {
                     if (json.data.revalidate === 'sidebar') {
                         queryClient.invalidateQueries({
                             queryKey: ['sidebar'],
                         });
-                    } else if (json.data.revalidate === 'redirect') {
-                        router.push(getFileUrl(json.data.data.id, false));
+                    } else if (
+                        json.data.revalidate === 'redirect' ||
+                        title !== removeExtension(fileName)
+                    ) {
+                        router.replace(getFileUrl(json.data.id, false));
                     }
                 }
             } catch (error: any) {
