@@ -7,6 +7,7 @@ type ErrorStrings =
     | 'Not found'
     | 'There already is a resource at given file path'
     | 'There is no file with the given `fileId`'
+    | 'Updated file name is the same as in our records'
     | '`fileData` is undefined and the `fileName` is the same'
     | 'File should only be renamed but could not be retrieved'
     | 'Internal error while preparing Supabase transaction'

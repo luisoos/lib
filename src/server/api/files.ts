@@ -262,7 +262,7 @@ export async function uploadFileFromUploader(
     };
 }
 
-// Function to update a file
+// Function to update a note
 export async function updateNote(
     fileName: string,
     fileId: string,
@@ -317,12 +317,12 @@ export async function updateNote(
         // Only `fileName` was submitted, thus only the name should be changed;
         // we know this, because `buffer` must be set otherwise
         if (!content) {
-            // Error handling in case the old file could not be found
+            // Error handling in case the old file could not be found or the file is not a note
             if (!oldFile.data || oldFile.error || 'signedUrl' in oldFile.data)
                 return {
                     data: null,
                     error: 'File should only be renamed but could not be retrieved',
-                    status: 400,
+                    status: 404,
                 };
             // Decode the base64 file data
             content = oldFile.data.fileContent;
@@ -381,6 +381,95 @@ export async function updateNote(
             error: uploadError,
             status: !fileNameNotChanged && !removeError ? 301 : 200,
             revalidate: !fileNameNotChanged ? 'redirect' : 'sidebar',
+        };
+    } catch (error: any) {
+        console.log(error);
+        return { data: null, error: error, status: error.status ?? 500 };
+    }
+}
+
+// Function to update a file
+export async function updateFilename(
+    fileName: string,
+    fileId: string,
+    upsert: boolean = false,
+): Promise<ServerActionResponse<{ message: string }>> {
+    // Get supabase client and parameters
+    const supabase = createClient('storage');
+    // Fetch authenticated user
+    const user = await getProfile();
+    if (!user) return { data: null, error: 'Unauthorized', status: 401 };
+    const userId = user.id;
+
+    let content: string | undefined;
+    const folder = await getPathTokens(supabase, fileId);
+    if (!Array.isArray(folder))
+        return {
+            data: null,
+            error: 'There is no file with the given `fileId`',
+            status: 404,
+        };
+    if (userId !== folder[0])
+        return {
+            data: null,
+            error: 'Unauthorized',
+            status: 401,
+        };
+    // Save the original file path to work with the other variable; using `.join()` here
+    // is crucial: otherwise we would have to explicitly freeze it here, because the new
+    // variable would just point to the original variable and thus also contain changes
+    // we make to the latter in the upcoming steps.
+    const oldFilePath: string = folder.join('/');
+    const fileNameNotChanged = folder[folder.length - 1] === fileName;
+
+    if (fileNameNotChanged)
+        return {
+            data: null,
+            error: 'Updated file name is the same as in our records',
+            status: 400,
+        };
+
+    const oldFile = await getFileById(fileId);
+
+    // Error handling in case the old file could not be found
+    if (!oldFile.data || oldFile.error)
+        return {
+            data: null,
+            error: 'File should only be renamed but could not be retrieved',
+            status: 404,
+        };
+
+    // Set new filename & path
+    folder[folder.length - 1] = fileName
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    const newPath: string = folder.join('/');
+
+    try {
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from(env.SUPABASE_BUCKET_NAME)
+            .move(oldFilePath, newPath);
+
+        if (uploadError) {
+            if ((uploadError as any).error.includes('Duplicate')) {
+                return {
+                    data: null,
+                    error: 'There already is a resource at given file path',
+                    status: 409,
+                };
+            } else {
+                return {
+                    data: null,
+                    error: uploadError,
+                    status: 500,
+                };
+            }
+        }
+
+        return {
+            data: uploadData,
+            error: uploadError,
+            status: 200,
         };
     } catch (error: any) {
         console.log(error);

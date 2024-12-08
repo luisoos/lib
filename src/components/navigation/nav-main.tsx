@@ -26,6 +26,7 @@ import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import FileTreeContextMenu from '../controls/FileTreeContextMenu';
 import { Skeleton2 } from '../ui/skeleton';
+import removeExtension from '~/hooks/files/removeExtension';
 
 export function NavMain({
     items,
@@ -71,7 +72,9 @@ export function NavMain({
                                                     />
                                                 )}
                                                 <span className='truncate'>
-                                                    {item.title}
+                                                    {removeExtension(
+                                                        item.title,
+                                                    )}
                                                 </span>
                                                 {item.items && (
                                                     <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
@@ -101,29 +104,34 @@ export function NavMain({
                                 </SidebarMenuItem>
                             </Collapsible>
                         ) : (
-                            <Link
-                                href={getFileUrl(item.url, isDashboard)}
-                                key={item.url}>
+                            <div key={item.url}>
                                 <FileTreeContextMenu item={item}>
                                     <SidebarMenuButton
                                         tooltip={item.title}
-                                        className='text-black'>
-                                        {item.icon && (
-                                            <DynamicIcon
-                                                name={
-                                                    item.icon as LucideIconName
-                                                }
-                                            />
-                                        )}
-                                        <span className='truncate'>
-                                            {item.title}
-                                        </span>
-                                        {item.items && (
-                                            <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
-                                        )}
+                                        asChild>
+                                        <Link
+                                            href={getFileUrl(
+                                                item.url,
+                                                isDashboard,
+                                            )}
+                                            className='text-black'>
+                                            {item.icon && (
+                                                <DynamicIcon
+                                                    name={
+                                                        item.icon as LucideIconName
+                                                    }
+                                                />
+                                            )}
+                                            <span className='truncate'>
+                                                {removeExtension(item.title)}
+                                            </span>
+                                            {item.items && (
+                                                <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                                            )}
+                                        </Link>
                                     </SidebarMenuButton>
                                 </FileTreeContextMenu>
-                            </Link>
+                            </div>
                         );
                     })}
                 </SidebarMenu>
