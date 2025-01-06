@@ -7,7 +7,6 @@ import { env } from 'process';
 
 import { db } from '~/server/db';
 import { resend } from '~/server/email';
-import { getUserByEmail } from '../api/user';
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -62,13 +61,13 @@ export const authConfig = {
         Email({
             from: 'onboarding@resend.dev',
             maxAge: 60 * 60,
-            // sendVerificationRequest: await sendVerificationEmail,
             sendVerificationRequest: async ({ identifier, url, provider }) => {
                 const { host } = new URL(url);
 
                 try {
-                    const user = await getUserByEmail({
-                        email: identifier,
+                    // Can't utilise ~/server/api/user@getUserByEmail here: https://github.com/nextauthjs/next-auth/discussions/11276#discussioncomment-9937737
+                    const user = await db.user.findFirst({
+                        where: { email: identifier },
                     });
                     const username = user ? user.name : identifier;
 
