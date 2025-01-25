@@ -38,6 +38,13 @@ export function NavMain({
     const pathname = usePathname();
     const isDashboard = pathname === '/dashboard';
 
+    const [openStates, setOpenStates] = useState<Record<string, boolean>>(() => 
+        items.reduce((acc, item) => {
+            acc[item.id ?? item.title] = pathname === getFileUrl(item.url);
+            return acc;
+        }, {} as Record<string, boolean>)
+    );
+
     return (
         <SidebarGroup>
             <div className='flex'>
@@ -47,16 +54,18 @@ export function NavMain({
             {!isLoading ? (
                 <SidebarMenu>
                     {items.map((item) => {
+                        const itemId = item.id ?? item.title;
                         item.isActive = pathname === getFileUrl(item.url);
-                        const [open, setOpen] = useState<boolean>(
-                            item.isActive,
-                        );
+                        const open = openStates[itemId] ?? item.isActive;
                         return !item.url ? (
                             <Collapsible
                                 key={item.title + item.items?.length}
                                 asChild
                                 open={open}
-                                onClick={() => setOpen(!open)}
+                                onClick={() => setOpenStates(prev => ({
+                                    ...prev,
+                                    [itemId]: !prev[itemId]
+                                }))}
                                 className='group/collapsible'>
                                 <SidebarMenuItem>
                                     <CollapsibleTrigger asChild>

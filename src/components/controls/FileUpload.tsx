@@ -3,13 +3,21 @@
 import React, { useState } from 'react';
 import { FilePlus2 } from 'lucide-react'; // Import your Lucide icon here
 import upload from '~/hooks/files/upload';
+import { toast } from '~/hooks/use-toast';
 
 const FileUpload = () => {
     const handleFileChange = async (
         event: React.ChangeEvent<HTMLInputElement>,
     ) => {
         const selectedFile = event.target.files?.[0];
-        await upload(selectedFile);
+        const status = await upload(selectedFile);
+        if (status.statusCode !== 200) {
+            toast({
+                variant: 'destructive',
+                title: 'Something went wrong!',
+                description: status.error,
+            });
+        }
     };
 
     return (

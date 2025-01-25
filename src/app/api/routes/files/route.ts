@@ -3,10 +3,28 @@ import { z } from 'zod';
 import getFileUrl from '~/hooks/files/getFileUrl';
 import validateQuery from '~/hooks/validateQuery';
 import { getStructure, uploadFile } from '~/server/api/files';
+import { ErrorMessage } from '~/types/api/response';
 
 const uploadFileSchema = z.object({
     fileName: z.string(),
-    fileType: z.string(),
+    fileType: z.string().refine((type) => {
+        const allowedTypes = [
+            'image/jpeg', 
+            'image/png', 
+            'image/webp', 
+            'application/pdf',
+            'text/plain',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/json',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-powerpoint',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'text/html'
+        ];
+        return allowedTypes.includes(type);
+    }, { message: "Unsupported file type" } as ErrorMessage),
     fileData: z.string(),
     folderName: z.string().optional(),
 });
@@ -70,7 +88,16 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json(); // Parse the JSON body of the request
-        const parsedData = uploadFileSchema.parse(body);
+        let parsedData;
+        try {
+            parsedData = uploadFileSchema.parse(body);
+        } catch (error) {
+            const validationError = error as z.ZodError;
+            return NextResponse.json(
+                { success: false, error: validationError.errors },
+                { status: 400 }
+            );
+        }
 
         const url = new URL(request.url);
         const upsert = Boolean(

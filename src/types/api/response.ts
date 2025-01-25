@@ -14,7 +14,12 @@ type ErrorStrings =
     | 'Internal error'
     | 'There already is a resource at given file path'
     | 'Could not find file or corresponding path'
-    | 'Failed to delete upload secret';
+    | 'Failed to delete upload secret'
+    | 'Unsupported file type';
+
+export interface ErrorMessage {
+    message: ErrorStrings;
+}
 
 export type ServerActionResponse<DataType> = {
     data: null | DataType;

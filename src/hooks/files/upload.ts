@@ -1,46 +1,47 @@
-import { redirect } from 'next/navigation';
-
 export default async function upload(
     file: File | undefined,
-    path?: string | null,
-) {
-    if (file) {
-        console.log(path);
-        const reader = new FileReader();
+    path?: string | null
+): Promise<any> {
+    if (!file) return;
 
-        reader.onloadend = async () => {
-            const base64Data = reader.result?.toString().split(',')[1]; // Get Base64 part
-            if (base64Data) {
-                try {
-                    const response = await fetch('/api/routes/files', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            fileName: file.name,
-                            fileType: file.type,
-                            fileData: base64Data,
-                            folderName: path,
-                        }),
-                    });
+    // Convert FileReader to a Promise
+    const readFileAsBase64 = (file: File): Promise<string> =>
+        new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64Data = reader.result?.toString().split(',')[1]; // Get Base64 part
+                if (base64Data) resolve(base64Data);
+                else reject(new Error('Failed to read file as base64'));
+            };
+            reader.onerror = reject; // Handle FileReader error
+            reader.readAsDataURL(file);
+        });
 
-                    const result = await response.json();
+    try {
+        const base64Data = await readFileAsBase64(file);
 
-                    if (response.ok) {
-                        console.log('File uploaded successfully:', result);
-                    } else {
-                        console.error(
-                            'Error uploading file:',
-                            result.error || 'Unknown error',
-                        );
-                    }
-                } catch (error) {
-                    console.error('Error uploading file:', error);
-                }
-            }
-        };
+        const response = await fetch('/api/routes/files', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                fileName: file.name,
+                fileType: file.type,
+                fileData: base64Data,
+                folderName: path,
+            }),
+        });
 
-        reader.readAsDataURL(file); // Read the file as a data URL
+        const result = await response.json();
+
+        if (response.ok) {
+            return { statusCode: response.status, data: result };
+        } else {
+            return { statusCode: response.status, error: result.error[0]?.message || 'Unknown error' };
+        }
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        return { statusCode: 500, error: 'Internal error occurred' };
     }
 }
