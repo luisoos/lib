@@ -1,11 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FilePlus2 } from 'lucide-react'; // Import your Lucide icon here
+import { FilePlus2 } from 'lucide-react';
 import upload from '~/hooks/files/upload';
 import { toast } from '~/hooks/use-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 const FileUpload = () => {
+    const queryClient = useQueryClient();
+
     const handleFileChange = async (
         event: React.ChangeEvent<HTMLInputElement>,
     ) => {
@@ -16,6 +19,10 @@ const FileUpload = () => {
                 variant: 'destructive',
                 title: 'Something went wrong!',
                 description: status.error,
+            });
+        } else {
+            queryClient.invalidateQueries({
+                queryKey: ['sidebar'],
             });
         }
     };
