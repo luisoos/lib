@@ -7,24 +7,27 @@ import { ErrorMessage } from '~/types/api/response';
 
 const uploadFileSchema = z.object({
     fileName: z.string(),
-    fileType: z.string().refine((type) => {
-        const allowedTypes = [
-            'image/jpeg', 
-            'image/png', 
-            'image/webp', 
-            'application/pdf',
-            'text/plain',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/json',
-            'application/vnd.ms-excel',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'application/vnd.ms-powerpoint',
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            'text/html'
-        ];
-        return allowedTypes.includes(type);
-    }, { message: "Unsupported file type" } as ErrorMessage),
+    fileType: z.string().refine(
+        (type) => {
+            const allowedTypes = [
+                'image/jpeg',
+                'image/png',
+                'image/webp',
+                'application/pdf',
+                'text/plain',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/json',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                'text/html',
+            ];
+            return allowedTypes.includes(type);
+        },
+        { message: 'Unsupported file type' } as ErrorMessage,
+    ),
     fileData: z.string(),
     folderName: z.string().optional(),
 });
@@ -95,7 +98,7 @@ export async function POST(request: NextRequest) {
             const validationError = error as z.ZodError;
             return NextResponse.json(
                 { success: false, error: validationError.errors },
-                { status: 400 }
+                { status: 400 },
             );
         }
 

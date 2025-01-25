@@ -1,6 +1,6 @@
 export default async function upload(
     file: File | undefined,
-    path?: string | null
+    path?: string | null,
 ): Promise<any> {
     if (!file) return;
 
@@ -38,7 +38,10 @@ export default async function upload(
         if (response.ok) {
             return { statusCode: response.status, data: result };
         } else {
-            return { statusCode: response.status, error: result.error[0]?.message || 'Unknown error' };
+            return {
+                statusCode: response.status,
+                error: result.error[0]?.message || 'Unknown error',
+            };
         }
     } catch (error) {
         console.error('Error uploading file:', error);

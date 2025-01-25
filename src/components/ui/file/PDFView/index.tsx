@@ -19,6 +19,11 @@ import {
 } from 'react-pdf-highlighter-extended';
 import { CommentedHighlight } from '~/types/files/pdf';
 import { useToast } from '~/hooks/use-toast';
+import {
+    ResizablePanelGroup,
+    ResizablePanel,
+    ResizableHandle,
+} from '../../resizable';
 
 const getNextId = () => String(Math.random()).slice(2);
 
@@ -63,7 +68,7 @@ const PDFView = ({ fileId, pdfUrl }: { fileId: string; pdfUrl: string }) => {
                         variant: 'destructive',
                         title: 'Failed to retrieve highlights.',
                         description:
-                            'We had an getting your highlights for this document. Try again.',
+                            'We had an error getting your highlights for this document. Try again.',
                     });
                 }
             } catch (error) {
@@ -260,70 +265,80 @@ const PDFView = ({ fileId, pdfUrl }: { fileId: string; pdfUrl: string }) => {
         <div
             className='flex flex-col-reverse xl:flex-row xl:overflow-hidden'
             style={{ height: '99%' }}>
-            {highlightsLoading ? (
-                <p>Loading highlights...</p>
-            ) : (
-                <Sidebar
-                    highlights={highlights}
-                    resetHighlights={resetHighlights}
-                />
-            )}
-            <div className='max-xl:min-h-[700px] xl:overflow-hidden relative flex-grow border'>
-                <Toolbar
-                    setPdfScaleValue={(value) => setPdfScaleValue(value)}
-                    toggleHighlightPen={() => setHighlightPen(!highlightPen)}
-                />
-                <PdfLoader document={pdfUrl}>
-                    {(pdfDocument: any) => (
-                        <PdfHighlighter
-                            enableAreaSelection={(event: { altKey: any }) =>
-                                event.altKey
-                            }
-                            pdfDocument={pdfDocument}
-                            onScrollAway={resetHash}
-                            utilsRef={(_pdfHighlighterUtils: any) => {
-                                highlighterUtilsRef.current =
-                                    _pdfHighlighterUtils;
-                            }}
-                            pdfScaleValue={pdfScaleValue}
-                            textSelectionColor={
-                                highlightPen
-                                    ? 'rgba(255, 226, 143, 1)'
-                                    : undefined
-                            }
-                            onSelection={
-                                highlightPen
-                                    ? (selection: {
-                                          makeGhostHighlight: () => any;
-                                      }) =>
-                                          addHighlight(
-                                              selection.makeGhostHighlight(),
-                                              '',
-                                          )
-                                    : undefined
-                            }
-                            selectionTip={
-                                highlightPen ? undefined : (
-                                    <ExpandableTip
-                                        addHighlight={addHighlight}
-                                    />
-                                )
-                            }
-                            highlights={
-                                (highlightsLoading ? [] : highlights) || []
-                            }
-                            style={{
-                                height: 'calc(100% - 41px)',
-                                background: '#fff',
-                            }}>
-                            <HighlightContainer
-                                editHighlight={editHighlight}
-                                onContextMenu={handleContextMenu}
-                            />
-                        </PdfHighlighter>
+            <ResizablePanelGroup direction='horizontal'>
+                <ResizablePanel minSize={10} defaultSize={25} className='sidebar w-full max-xl:mt-2 xl:w-1/6 xl:max-w-[500px]'>
+                    {highlightsLoading ? (
+                        <p>Loading highlights...</p>
+                    ) : (
+                        <Sidebar
+                            highlights={highlights}
+                            resetHighlights={resetHighlights}
+                        />
                     )}
-                </PdfLoader>
-            </div>
+                </ResizablePanel>
+                <ResizableHandle withHandle className="mx-2" />
+                <ResizablePanel defaultSize={75} className='max-xl:min-h-[700px] xl:overflow-hidden relative flex-grow border'>
+                        <Toolbar
+                            setPdfScaleValue={(value) =>
+                                setPdfScaleValue(value)
+                            }
+                            toggleHighlightPen={() =>
+                                setHighlightPen(!highlightPen)
+                            }
+                        />
+                        <PdfLoader document={pdfUrl}>
+                            {(pdfDocument: any) => (
+                                <PdfHighlighter
+                                    enableAreaSelection={(event: {
+                                        altKey: any;
+                                    }) => event.altKey}
+                                    pdfDocument={pdfDocument}
+                                    onScrollAway={resetHash}
+                                    utilsRef={(_pdfHighlighterUtils: any) => {
+                                        highlighterUtilsRef.current =
+                                            _pdfHighlighterUtils;
+                                    }}
+                                    pdfScaleValue={pdfScaleValue}
+                                    textSelectionColor={
+                                        highlightPen
+                                            ? 'rgba(255, 226, 143, 1)'
+                                            : undefined
+                                    }
+                                    onSelection={
+                                        highlightPen
+                                            ? (selection: {
+                                                  makeGhostHighlight: () => any;
+                                              }) =>
+                                                  addHighlight(
+                                                      selection.makeGhostHighlight(),
+                                                      '',
+                                                  )
+                                            : undefined
+                                    }
+                                    selectionTip={
+                                        highlightPen ? undefined : (
+                                            <ExpandableTip
+                                                addHighlight={addHighlight}
+                                            />
+                                        )
+                                    }
+                                    highlights={
+                                        (highlightsLoading ? [] : highlights) ||
+                                        []
+                                    }
+                                    style={{
+                                        height: 'calc(100% - 41px)',
+                                        background: '#fff',
+                                    }}>
+                                    <HighlightContainer
+                                        editHighlight={editHighlight}
+                                        onContextMenu={handleContextMenu}
+                                    />
+                                </PdfHighlighter>
+                            )}
+                        </PdfLoader>
+                </ResizablePanel>
+            </ResizablePanelGroup>
 
             {contextMenu && <ContextMenu {...contextMenu} />}
         </div>

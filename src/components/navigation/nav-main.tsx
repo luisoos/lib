@@ -38,11 +38,14 @@ export function NavMain({
     const pathname = usePathname();
     const isDashboard = pathname === '/dashboard';
 
-    const [openStates, setOpenStates] = useState<Record<string, boolean>>(() => 
-        items.reduce((acc, item) => {
-            acc[item.id ?? item.title] = pathname === getFileUrl(item.url);
-            return acc;
-        }, {} as Record<string, boolean>)
+    const [openStates, setOpenStates] = useState<Record<string, boolean>>(() =>
+        items.reduce(
+            (acc, item) => {
+                acc[item.id ?? item.title] = pathname === getFileUrl(item.url);
+                return acc;
+            },
+            {} as Record<string, boolean>,
+        ),
     );
 
     return (
@@ -62,10 +65,12 @@ export function NavMain({
                                 key={item.title + item.items?.length}
                                 asChild
                                 open={open}
-                                onClick={() => setOpenStates(prev => ({
-                                    ...prev,
-                                    [itemId]: !prev[itemId]
-                                }))}
+                                onClick={() =>
+                                    setOpenStates((prev) => ({
+                                        ...prev,
+                                        [itemId]: !prev[itemId],
+                                    }))
+                                }
                                 className='group/collapsible'>
                                 <SidebarMenuItem>
                                     <CollapsibleTrigger asChild>

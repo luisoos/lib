@@ -14,7 +14,7 @@ const updateHash = (highlight: Highlight) => {
 
 const Sidebar = ({ highlights, resetHighlights }: SidebarProps) => {
     return (
-        <div className='sidebar w-full max-xl:mt-2 xl:w-1/6 xl:max-w-[500px] xl:mr-2'>
+        <div>
             {/* Description section */}
             <h2 className='text-xl font-medium'>Highlights</h2>
             <div className='description mb-2'>
@@ -41,7 +41,7 @@ const Sidebar = ({ highlights, resetHighlights }: SidebarProps) => {
                                     {highlight.comment}
                                 </p>
                                 {highlight.content.text && (
-                                    <blockquote className='my-1 p-0.5 border-l border-zinc-400 pl-1.5 quotes'>
+                                    <blockquote className='my-1 p-0.5 border-l border-zinc-400 pl-1.5 quotes break-words'>
                                         {`${highlight.content.text.slice(0, 90).trim()}…`}
                                     </blockquote>
                                 )}
