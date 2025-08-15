@@ -5,6 +5,9 @@ Chat with all of your documents at once. Perfect for school & university.
 > [!NOTE]
 > `/lib` is a web-based SaaS that lets users use huge context-aware vector AI.
 
+## To-do
+- [ ] AI integration
+
 ## Tech Stack
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`. Both the Backend and Frontend are made using [Next.js](https://nextjs.org) with TypeScript. Furthermore, this project uses:
