@@ -1,7 +1,8 @@
 import React from 'react';
 import type { Highlight } from 'react-pdf-highlighter-extended';
 import { CommentedHighlight } from '~/types/files/pdf';
-import { Button } from '../../button';
+
+import { useOperatingSystem } from '~/hooks/use-operating-system';
 
 interface SidebarProps {
     highlights: Array<CommentedHighlight> | undefined;
@@ -13,16 +14,23 @@ const updateHash = (highlight: Highlight) => {
 };
 
 const Sidebar = ({ highlights, resetHighlights }: SidebarProps) => {
+    const { isWindows } = useOperatingSystem();
+
     return (
         <div>
             {/* Description section */}
             <h2 className='text-xl font-medium'>Highlights</h2>
             <div className='description mb-2'>
-                <p>
-                    <small>
-                        To create an area highlight hold ⌥ Option key (Alt),
-                        then click and drag.
-                    </small>
+                <p className="text-sm">
+                        To create an area highlight hold {
+                            isWindows ? (
+                                <><kbd>Alt</kbd> (⌥ Option)</>
+                            ) : (
+                                <>
+                                    ⌥ Option (<kbd>Alt</kbd>)
+                                </>
+                            )
+                        }, then click and drag.
                 </p>
             </div>
 

@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json(); // Parse the JSON body of the request
 
         const highlightData = highlightSchema.parse({
-            title: body.highlight?.content?.text,
+            title: body.highlight?.content?.text || '',
             description: body.comment,
             storageObjectId: body.fileId,
             highlightData: body.highlight?.position,
