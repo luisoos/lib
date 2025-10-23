@@ -46,7 +46,13 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
         const file = new File([''], 'New Note.txt', {
             type: 'text/plain',
         });
-        await upload(file, item?.id ?? '');
+        const result = await upload(file, item?.id ?? '');
+
+        if (result.statusCode === 200) {
+            toast({
+                title: 'File created successfully.',
+            });
+        }
     };
 
     const handleRenameFileClick = async () => {
@@ -184,27 +190,29 @@ const FileTreeContextMenu: React.FC<ControlComponentProps> = ({
                         />
                     </ContextMenuItem>
                     <ContextMenuItem>
+                        {/* TODO: Implement folder creation */}
                         <ContextMenuAction
                             icon='FolderPlus'
                             label='New Folder'
                         />
                     </ContextMenuItem>
                     <ContextMenuItem>
+                        {/* TODO: Implement extensive download functionality with many options */}
                         <ContextMenuAction icon='Share' label='Export' />
                     </ContextMenuItem>
-                    <ContextMenuItem>
+                    {(item && item.id) && <ContextMenuItem>
                         <DialogTrigger className='w-full'>
                             <ContextMenuAction icon='Edit' label='Rename' />
                         </DialogTrigger>
-                    </ContextMenuItem>
-                    <ContextMenuItem>
+                    </ContextMenuItem>}
+                    {(item && item.id) && <ContextMenuItem>
                         <ContextMenuAction
                             onClick={handleDeleteFileClick}
                             icon='Trash2'
                             label='Delete'
                             className='text-red-600'
                         />
-                    </ContextMenuItem>
+                    </ContextMenuItem>}
                 </ContextMenuContent>
             </ContextMenu>
             <DialogContent>

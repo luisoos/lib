@@ -21,7 +21,6 @@ const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
             const response = await fetch(`/api/routes/files/${slug}`);
             if (response.ok) {
                 const data = await response.json();
-                console.log(data);
                 setFileData(data.data.fileContent ?? data.data.signedUrl);
                 setFileName(data.data.fileName);
                 setFileType(data.data.mimetype);
@@ -34,21 +33,26 @@ const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
         fetchFile();
     }, [slug]);
 
-    if (fileData) {
+    if (
+        fileData !== undefined &&
+        fileName !== undefined &&
+        fileType !== undefined &&
+        lastModified !== undefined
+    ) {
         return (
             <>
                 <View
                     fileId={slug}
-                    file={fileData!}
-                    fileType={fileType!}
-                    fileName={fileName!}
-                    lastModified={lastModified!}
+                    file={fileData}
+                    fileType={fileType}
+                    fileName={fileName}
+                    lastModified={lastModified}
                 />
                 <ChatInterface />
             </>
         );
     } else {
-        <>Loading file</>;
+        return <>Loading file</>;
     }
 };
 

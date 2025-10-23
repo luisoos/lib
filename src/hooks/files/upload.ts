@@ -1,8 +1,8 @@
 export default async function upload(
     file: File | undefined,
     path?: string | null,
-): Promise<any> {
-    if (!file) return;
+): Promise<{ statusCode: number; data?: any; error?: string }> {
+    if (!file) return { statusCode: 400, error: 'No file provided' };
 
     // Convert FileReader to a Promise
     const readFileAsBase64 = (file: File): Promise<string> =>
@@ -10,7 +10,7 @@ export default async function upload(
             const reader = new FileReader();
             reader.onloadend = () => {
                 const base64Data = reader.result?.toString().split(',')[1]; // Get Base64 part
-                if (base64Data) resolve(base64Data);
+                if (typeof base64Data === 'string') resolve(base64Data);
                 else reject(new Error('Failed to read file as base64'));
             };
             reader.onerror = reject; // Handle FileReader error

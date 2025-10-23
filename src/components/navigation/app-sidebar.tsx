@@ -26,7 +26,6 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
 
     const fetchFiles = async () => {
         const response = await fetch('/api/routes/files');
-        console.log('fetching sidebar data');
         if (!response.ok) {
             throw new Error('Could not fetch file structure');
         }
