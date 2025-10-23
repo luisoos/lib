@@ -32,7 +32,6 @@ export const env = createEnv({
         // DISCORD_CLIENT_SECRET: z.string(),
         AUTH_GITHUB_ID: z.string(),
         AUTH_GITHUB_SECRET: z.string(),
-        PINECONE_API_KEY: z.string(),
     },
 
     /**
@@ -65,7 +64,6 @@ export const env = createEnv({
         // DISCORD_CLIENT_SECRET: process.env.DISCORD_CLIENT_SECRET,
         AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID,
         AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
-        PINECONE_API_KEY: process.env.PINECONE_API_KEY,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

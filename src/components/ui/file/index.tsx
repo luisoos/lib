@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import ChatInterface from '~/components/chat';
 import View from '~/hooks/display/use-view';
 
 interface RenderFileProps {
@@ -35,13 +36,16 @@ const RenderFile: React.FC<RenderFileProps> = ({ slug }) => {
 
     if (fileData) {
         return (
-            <View
-                fileId={slug}
-                file={fileData!}
-                fileType={fileType!}
-                fileName={fileName!}
-                lastModified={lastModified!}
-            />
+            <>
+                <View
+                    fileId={slug}
+                    file={fileData!}
+                    fileType={fileType!}
+                    fileName={fileName!}
+                    lastModified={lastModified!}
+                />
+                <ChatInterface />
+            </>
         );
     } else {
         <>Loading file</>;

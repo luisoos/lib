@@ -188,7 +188,7 @@ export async function uploadFile(
         .from(env.SUPABASE_BUCKET_NAME)
         .upload(
             `${userId}/${folder}${fileName.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`,
-            buffer.toString(),
+            buffer,
             {
                 contentType: fileType,
                 upsert: upsert || (fileName === 'New Note.txt' ? false : true),
