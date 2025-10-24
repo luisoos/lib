@@ -9,9 +9,9 @@ import {
     SidebarTrigger,
 } from '~/components/ui/sidebar';
 import { getProfile } from '~/server/api/user';
-import { getServerSideSession } from '~/server/auth';
 import { User } from '~/types/dashboard/sidebar';
 import QueryClientContextProvider from '~/components/QueryClientContextProvider';
+import { getServerSideSession } from '~/server/auth';
 
 export default async function RootLayout({
     children,

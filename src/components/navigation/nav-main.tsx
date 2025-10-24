@@ -22,7 +22,7 @@ import Dropzone from '~/components/controls/Dropzone';
 import getFileUrl from '~/hooks/files/getFileUrl';
 import { usePathname } from 'next/navigation';
 import { DynamicIcon, LucideIconName } from '~/hooks/icons';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Sparkle } from 'lucide-react';
 import Link from 'next/link';
 import FileTreeContextMenu from '../controls/FileTreeContextMenu';
 import { Skeleton2 } from '../ui/skeleton';

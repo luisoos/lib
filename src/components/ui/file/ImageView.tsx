@@ -1,6 +1,6 @@
 import React from 'react';
-import { Heading } from '../dashboard/heading';
 import { Image, Calendar, Dot } from 'lucide-react';
+import { Heading } from '~/components/dashboard/heading';
 
 const ImageView: React.FC<{
     content: string;

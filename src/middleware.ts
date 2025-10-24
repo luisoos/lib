@@ -1,4 +1,3 @@
-import { getServerSession } from 'next-auth';
 import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '~/utils/supabase/middleware';
 

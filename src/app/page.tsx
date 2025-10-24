@@ -7,8 +7,8 @@ import { env } from '~/env';
 // UI
 // Icons
 import { ArrowRight } from 'lucide-react';
-import { getServerSideSession } from '~/server/auth';
 import { Features } from '~/components/ui/landing-page/features';
+import { getServerSideSession } from '~/server/auth';
 
 export default async function Home() {
     const session = await getServerSideSession();

@@ -1,6 +1,8 @@
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import { Session, type DefaultSession } from 'next-auth';
-import { Adapter, AdapterUser } from 'next-auth/adapters';
+import { Session, User, type DefaultSession } from 'next-auth';
+import { Adapter } from 'next-auth/adapters';
+
+
 import Email from 'next-auth/providers/email';
 import GitHub from 'next-auth/providers/GitHub';
 import { env } from 'process';
@@ -14,19 +16,14 @@ import { resend } from '~/server/email';
  *
  * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
  */
-declare module 'next-auth' {
-    interface Session extends DefaultSession {
-        user: {
-            id: string;
-            // ...other properties
-            // role: UserRole;
-        } & DefaultSession['user'];
-    }
+// src/types/next-auth.d.ts
 
-    // interface User {
-    //   // ...other properties
-    //   // role: UserRole;
-    // }
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+    } & DefaultSession["user"];
+  }
 }
 
 /**
@@ -36,18 +33,9 @@ declare module 'next-auth' {
  */
 export const authConfig = {
     callbacks: {
-        async session({
-            session,
-            token,
-            user,
-        }: {
-            session: Session;
-            token: any;
-            user: AdapterUser;
-        }) {
-            // Attach the user ID from the token to the session object
-            if (token) {
-                session.user.id = token.id; // Attach user ID to session
+        session({ session, user }: { session: Session; user: User }) {
+            if (session.user) {
+                session.user.id = user.id;
             }
             return session;
         },

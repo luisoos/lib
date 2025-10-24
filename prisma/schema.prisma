@@ -71,6 +71,7 @@ model User {
     sessions      Session[]
     posts         Post[]
     uploadSecret  UploadSecret?
+    aiChats       AiChat[]
 
     @@schema("public")
 }
@@ -102,6 +103,27 @@ model Highlight {
     description       String?  // Optional description of the highlight
     data              Json
     storageObjectId   String      // Foreign key referencing objects.id
+
+    @@schema("public")
+}
+
+model AiChat {
+    id        String   @id @default(cuid())
+    userId    String
+    messages  Json     @default("[]")
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@schema("public")
+}
+
+model Conversation {
+    id        String   @id @default(cuid())
+    userId    String
+    title     String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     @@schema("public")
 }
