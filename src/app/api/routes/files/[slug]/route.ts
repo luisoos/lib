@@ -327,7 +327,10 @@ export async function DELETE(
         // deleteMany returns a BatchPayload with a `count` property — no `error` field
         if (typeof analysisDeletionResult.count !== 'number') {
             return NextResponse.json(
-                { success: false, error: 'Failed to delete document analysis records' },
+                {
+                    success: false,
+                    error: 'Failed to delete document analysis records',
+                },
                 { status: 500 }, // Internal Server Error
             );
         }

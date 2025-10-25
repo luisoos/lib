@@ -56,8 +56,7 @@ export default function Page() {
                     </div>
                     <div className='flex items-center gap-2'>
                         {streamingMessage && (
-                            <div
-                                className='bg-brand text-white px-2 py-1 rounded-md flex items-center gap-1'>
+                            <div className='bg-brand text-white px-2 py-1 rounded-md flex items-center gap-1'>
                                 <Loader2 className='h-3 w-3 animate-spin' />
                                 AI is typing...
                             </div>

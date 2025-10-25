@@ -53,9 +53,7 @@ export default function ChatHistory({
                     new Map(sanitized.map((c) => [c.id, c] as const)).values(),
                 );
                 setLatestChats(unique);
-                setHasMoreData(
-                    AiChats.headers.get('X-Has-More') === 'true',
-                );
+                setHasMoreData(AiChats.headers.get('X-Has-More') === 'true');
             } catch (error: any) {
                 setError('Failed to fetch conversations.');
             } finally {
@@ -182,7 +180,11 @@ function SkeletonOrContent({
                             }}>
                             <ChatHistoryBox
                                 chatId={chat.id}
-                                messages={Array.isArray(chat.messages) ? (chat.messages as unknown as ChatMessage[]) : []}
+                                messages={
+                                    Array.isArray(chat.messages)
+                                        ? (chat.messages as unknown as ChatMessage[])
+                                        : []
+                                }
                                 updatedAt={chat.updatedAt}
                                 onClick={() => setChatId(chat.id)}
                                 initiateReload={initiateReload}

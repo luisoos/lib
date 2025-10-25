@@ -2,7 +2,6 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import { Session, User, type DefaultSession } from 'next-auth';
 import { Adapter } from 'next-auth/adapters';
 
-
 import Email from 'next-auth/providers/email';
 import GitHub from 'next-auth/providers/GitHub';
 import { env } from 'process';
@@ -18,12 +17,12 @@ import { resend } from '~/server/email';
  */
 // src/types/next-auth.d.ts
 
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-    } & DefaultSession["user"];
-  }
+declare module 'next-auth' {
+    interface Session {
+        user: {
+            id: string;
+        } & DefaultSession['user'];
+    }
 }
 
 /**

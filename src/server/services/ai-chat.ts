@@ -18,7 +18,8 @@ export async function updateOrCreateAiChat({
         });
 
         if (existingChat) {
-            const currentMessages = existingChat.messages as unknown as Message[];
+            const currentMessages =
+                existingChat.messages as unknown as Message[];
             const updatedMessages = [...currentMessages, ...newMessages];
 
             return await db.aiChat.update({

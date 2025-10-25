@@ -73,7 +73,7 @@
         "next-auth": "^4.24.8",
         "nodemailer": "^6.9.16",
         "ollama-ai-provider": "^1.2.0",
-        "pdf-parse": "1.1.1",
+        "pdf2json": "^4.0.0",
         "react": "^18.3.1",
         "react-bootstrap-icons": "^1.11.4",
         "react-dom": "^18.3.1",

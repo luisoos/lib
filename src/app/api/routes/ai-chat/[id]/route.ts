@@ -8,7 +8,7 @@ export async function GET(
 ) {
     try {
         const session = await getServerSideSession();
-        
+
         if (!session?.user?.id) {
             return NextResponse.json(
                 { error: 'Unauthorized' },
@@ -42,7 +42,7 @@ export async function DELETE(
 ) {
     try {
         const session = await getServerSideSession();
-        
+
         if (!session?.user?.id) {
             return NextResponse.json(
                 { error: 'Unauthorized' },

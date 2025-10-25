@@ -27,7 +27,8 @@ export default async function Home() {
                             </span>
                             lets you chat with all of your documents at once.
                             <br />
-                            Import <b>PDFs</b>, work with your notes <b>seamlessly</b>.
+                            Import <b>PDFs</b>, work with your notes{' '}
+                            <b>seamlessly</b>.
                         </p>
                         <p className='mt-4 mx-auto flex opacity-80 font-semibold'>
                             <Link

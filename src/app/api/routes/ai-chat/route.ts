@@ -23,7 +23,7 @@ const messageSchema = z.object({
 export async function GET(request: NextRequest, response: NextResponse) {
     try {
         const session = await getServerSideSession();
-        
+
         if (!session?.user?.id) {
             return NextResponse.json(
                 { error: 'Unauthorized' },
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
 export async function POST(request: NextRequest, response: NextResponse) {
     try {
         const session = await getServerSideSession();
-        
+
         if (!session?.user?.id) {
             return NextResponse.json(
                 { error: 'Unauthorized' },
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
                 { status: 400 },
             );
         }
-        
+
         let stream;
         try {
             stream = await groq.chat.completions.create({
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
             console.error('Groq API error:', groqError);
             return NextResponse.json(
                 { error: 'AI service unavailable' },
-                { status: 503 }
+                { status: 503 },
             );
         }
 

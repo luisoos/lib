@@ -36,7 +36,7 @@ const View: React.FC<{
         return <PDFView fileId={fileId} pdfUrl={file} />;
     } else {
         return (
-            <div className="flex items-center justify-center">
+            <div className='flex items-center justify-center'>
                 Filetype {fileType} is not supported.
             </div>
         );

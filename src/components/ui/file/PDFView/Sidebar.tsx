@@ -21,16 +21,18 @@ const Sidebar = ({ highlights, resetHighlights }: SidebarProps) => {
             {/* Description section */}
             <h2 className='text-xl font-medium'>Highlights</h2>
             <div className='description mb-2'>
-                <p className="text-sm">
-                        To create an area highlight hold {
-                            isWindows ? (
-                                <><kbd>Alt</kbd> (⌥ Option)</>
-                            ) : (
-                                <>
-                                    ⌥ Option (<kbd>Alt</kbd>)
-                                </>
-                            )
-                        }, then click and drag.
+                <p className='text-sm'>
+                    To create an area highlight hold{' '}
+                    {isWindows ? (
+                        <>
+                            <kbd>Alt</kbd> (⌥ Option)
+                        </>
+                    ) : (
+                        <>
+                            ⌥ Option (<kbd>Alt</kbd>)
+                        </>
+                    )}
+                    , then click and drag.
                 </p>
             </div>
 

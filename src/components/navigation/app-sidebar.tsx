@@ -58,16 +58,16 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
             </SidebarHeader>
             <SidebarContent className='h-full'>
                 {/* {isError && <p>Error: {error.message}</p>} Show error message */}
-                
-                <SidebarMenuItem className="p-2">
-                        <SidebarMenuButton asChild>
-                            <Link href='/dashboard/chat'>
-                                {/* TODO: sparkle not visible*/}
-                                <Sparkle className='w-4 h-4 bg-gradient-to-t from-blue-500 via-purple-500 to-yellow-500 bg-clip-text text-transparent' />
-                                <span>Chat</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
+
+                <SidebarMenuItem className='p-2'>
+                    <SidebarMenuButton asChild>
+                        <Link href='/dashboard/chat'>
+                            {/* TODO: sparkle not visible*/}
+                            <Sparkle className='w-4 h-4 bg-gradient-to-t from-blue-500 via-purple-500 to-yellow-500 bg-clip-text text-transparent' />
+                            <span>Chat</span>
+                        </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
                 <NavMain items={navMain} isLoading={isLoading} />
                 <Dropzone className='h-full max-h-96'>
                     <FileTreeContextMenu>

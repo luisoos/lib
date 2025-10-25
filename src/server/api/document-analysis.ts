@@ -1,9 +1,8 @@
-
 import { createClient } from '~/utils/supabase/server';
 import { env } from '~/env';
 import { getProfile } from '~/server/api/user';
-import { getServerSideSession } from "../auth";
-import { db } from "../db";
+import { getServerSideSession } from '../auth';
+import { db } from '../db';
 import { calculateDocumentHash } from '../embeds/file-hash';
 
 async function getAuthUser() {
@@ -31,7 +30,9 @@ export async function getUnanalysedFiles() {
     // Get all storage objects
     const { data: storageObjects, error: storageError } = await supabase
         .from('objects')
-        .select('id, name, updated_at, created_at, last_accessed_at, metadata, path_tokens, bucket_id')
+        .select(
+            'id, name, updated_at, created_at, last_accessed_at, metadata, path_tokens, bucket_id',
+        )
         .eq('bucket_id', env.SUPABASE_BUCKET_NAME)
         .like('name', `${userId}/%`)
         .order('updated_at', { ascending: false })
@@ -43,28 +44,34 @@ export async function getUnanalysedFiles() {
     }
 
     // Get all document analyses
-    const { data: analyses, error: analysesError } = await getDocumentAnalyses(userId);
-    
+    const { data: analyses, error: analysesError } =
+        await getDocumentAnalyses(userId);
+
     if (analysesError) {
         console.error('Error fetching analyses:', analysesError);
         return { data: null, error: 'Failed to fetch analyses', status: 500 };
     }
 
-    const unanalysedFiles = storageObjects.filter(file => {
-        // Get analysis for this file
-        const analysis = analyses.find(a => a.storage_object_id === file.id);
-        
-        if (!analysis) return true;
-        
-        // Check if file was updated after analysis
-        const fileDate = new Date(file.updated_at);
-        const analysisDate = new Date(analysis.createdAt);
-        
-        return fileDate > analysisDate;
-    }).map(file => ({
-        ...file,
-        analysisHash: analyses.find(a => a.storage_object_id === file.id)?.documentHash
-    }));
+    const unanalysedFiles = storageObjects
+        .filter((file) => {
+            // Get analysis for this file
+            const analysis = analyses.find(
+                (a) => a.storage_object_id === file.id,
+            );
+
+            if (!analysis) return true;
+
+            // Check if file was updated after analysis
+            const fileDate = new Date(file.updated_at);
+            const analysisDate = new Date(analysis.createdAt);
+
+            return fileDate > analysisDate;
+        })
+        .map((file) => ({
+            ...file,
+            analysisHash: analyses.find((a) => a.storage_object_id === file.id)
+                ?.documentHash,
+        }));
 
     return { data: unanalysedFiles, error: null, status: 200 };
 }
@@ -78,10 +85,7 @@ async function getDocumentAnalyses(userId: string) {
         .eq('user_id', userId);
 }
 
-export async function compareHashes(
-    fileName: string,
-    analysisHash: string,
-) {
+export async function compareHashes(fileName: string, analysisHash: string) {
     // Get supabase client and parameters
     const supabase = createClient('storage');
     const { data, error } = await supabase.storage
@@ -90,10 +94,24 @@ export async function compareHashes(
 
     if (error) {
         console.error('Error creating signed URL:', error);
-        return { data: null, success: false, error: 'Failed to create signed URL' };
+        return {
+            data: null,
+            success: false,
+            error: 'Failed to create signed URL',
+        };
     }
 
-    const documentHash = await calculateDocumentHash(data.signedUrl);
+    const response = await fetch(data.signedUrl);
+    const responseCloneForHash = response.clone()
+    const responseCloneForReturn = response.clone()
+    const arrayBuffer = await responseCloneForHash.arrayBuffer();
+    const documentHash = await calculateDocumentHash(arrayBuffer);
 
-    return { data: { hashesMatch: analysisHash === documentHash, signedFileUrl: data.signedUrl }, success: true  };
+    return {
+        data: {
+            hashesMatch: analysisHash === documentHash,
+            fileResponse: responseCloneForReturn,
+        },
+        success: true,
+    };
 }

@@ -83,7 +83,7 @@ const FileTreeContextMenu: React.FC<ExtendedControlComponentProps> = ({
 
     const handleNewNoteSubmit = async () => {
         if (isSubmitting) return;
-        
+
         setIsSubmitting(true);
         try {
             const fileName = name.trim() || 'New Note';
@@ -114,7 +114,7 @@ const FileTreeContextMenu: React.FC<ExtendedControlComponentProps> = ({
 
     const handleNewFolderSubmit = async () => {
         if (isSubmitting) return;
-        
+
         setIsSubmitting(true);
         try {
             // TODO: Implement folder creation API
@@ -166,7 +166,10 @@ const FileTreeContextMenu: React.FC<ExtendedControlComponentProps> = ({
                                             'Content-Type': 'application/json',
                                         },
                                         body: JSON.stringify({
-                                            fileName: addFileExtension(item, name),
+                                            fileName: addFileExtension(
+                                                item,
+                                                name,
+                                            ),
                                         }),
                                     },
                                 );
@@ -300,7 +303,11 @@ const FileTreeContextMenu: React.FC<ExtendedControlComponentProps> = ({
                     <div className='pt-2 flex w-full items-center space-x-2'>
                         <Input
                             onChange={(e) => setName(e.target.value)}
-                            value={dialogType === 'rename' ? removeExtension(name) : name}
+                            value={
+                                dialogType === 'rename'
+                                    ? removeExtension(name)
+                                    : name
+                            }
                             placeholder={config.placeholder}
                             autoFocus
                             disabled={isSubmitting}
@@ -312,15 +319,14 @@ const FileTreeContextMenu: React.FC<ExtendedControlComponentProps> = ({
                             }}
                         />
                         <DialogClose asChild>
-                            <Button 
-                                onClick={config.onSubmit} 
+                            <Button
+                                onClick={config.onSubmit}
                                 type='submit'
                                 disabled={isSubmitting}
-                                className="min-w-[125px]"
-                            >
+                                className='min-w-[125px]'>
                                 {isSubmitting ? (
-                                    <span className="flex items-center space-x-2">
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    <span className='flex items-center space-x-2'>
+                                        <div className='w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin' />
                                         <span>Processing...</span>
                                     </span>
                                 ) : (
@@ -366,21 +372,25 @@ const FileTreeContextMenu: React.FC<ExtendedControlComponentProps> = ({
                         {/* TODO: Implement extensive download functionality with many options */}
                         <ContextMenuAction icon='Share' label='Export' />
                     </ContextMenuItem>
-                    {(item && item.id) && <ContextMenuItem>
-                        <ContextMenuAction
-                            onClick={handleRenameClick}
-                            icon='Edit'
-                            label='Rename'
-                        />
-                    </ContextMenuItem>}
-                    {(item && item.id) && <ContextMenuItem>
-                        <ContextMenuAction
-                            onClick={handleDeleteFileClick}
-                            icon='Trash2'
-                            label='Delete'
-                            className='text-red-600'
-                        />
-                    </ContextMenuItem>}
+                    {item && item.id && (
+                        <ContextMenuItem>
+                            <ContextMenuAction
+                                onClick={handleRenameClick}
+                                icon='Edit'
+                                label='Rename'
+                            />
+                        </ContextMenuItem>
+                    )}
+                    {item && item.id && (
+                        <ContextMenuItem>
+                            <ContextMenuAction
+                                onClick={handleDeleteFileClick}
+                                icon='Trash2'
+                                label='Delete'
+                                className='text-red-600'
+                            />
+                        </ContextMenuItem>
+                    )}
                 </ContextMenuContent>
             </ContextMenu>
             {renderDialogContent()}

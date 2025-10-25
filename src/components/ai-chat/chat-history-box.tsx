@@ -11,7 +11,15 @@ import {
 import { Button } from '../ui/button';
 import { ChatMessage } from '~/types/ai-chat';
 import { toast } from '~/hooks/use-toast';
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../ui/alert-dialog';
+import {
+    AlertDialog,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '../ui/alert-dialog';
 
 const chatHistoryBoxMaxCharacterLength = 55;
 
