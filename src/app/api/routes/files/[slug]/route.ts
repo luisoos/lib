@@ -7,6 +7,7 @@ import {
     updateFilename,
     updateNote,
 } from '~/server/api/files';
+import { db } from '~/server/db';
 
 const updateFileSchema = z.object({
     fileName: z.string(), // Make fileName optional
@@ -314,6 +315,20 @@ export async function DELETE(
             return NextResponse.json(
                 { success: false, error: result.error },
                 { status: result.status ?? 500 }, // Internal Server Error
+            );
+        }
+
+        const analysisDeletionResult = await db.documentAnalysis.deleteMany({
+            where: {
+                storage_object_id: id,
+            },
+        });
+
+        // deleteMany returns a BatchPayload with a `count` property — no `error` field
+        if (typeof analysisDeletionResult.count !== 'number') {
+            return NextResponse.json(
+                { success: false, error: 'Failed to delete document analysis records' },
+                { status: 500 }, // Internal Server Error
             );
         }
 
