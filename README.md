@@ -130,6 +130,22 @@ AUTH_GITHUB_SECRET="<CLIENT_SECRET>"
 > [!IMPORTANT]
 > Also generate a new `NEXTAUTH_SECRET` in your `.env`.
 
+#### Create Supabase Vector Storage
+```sql
+-- Go to SQL Editor in Supabase Dashboard
+-- Use "OpenAI Vector Search" quickstart template
+create extension vector;
+
+create table documents (
+  id bigserial primary key,
+  content text,
+  embedding vector(1536),
+  metadata jsonb
+);
+
+create index on documents using ivfflat (embedding vector_cosine_ops);
+```
+
 #### Install dependencies
 
 ```bash

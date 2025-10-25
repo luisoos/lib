@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUnanalysedFiles } from "~/server/api/files";
+import { compareHashes, getUnanalysedFiles } from "~/server/api/document-analysis";
+import { processDocument } from "~/server/embeds/process-document";
 
 export async function POST(
     request: NextRequest,
 ) {
     try {
-        const body = await request.json(); // Parse the JSON body of the request
-
         // Get all documents having no document analysis
         const { data: unanalysedFiles, error: unanalysedFilesError, status: unanalysedFilesStatus } = await getUnanalysedFiles();
 
@@ -25,25 +24,37 @@ export async function POST(
         }
 
         // Loop
+        for (const file of unanalysedFiles) {
             // Compare hashes
+            const {data, success} = await compareHashes(
+                file.name,
+                file.analysisHash || '',
+            );
+
+            if (!success || !data) continue;
+
+            const { hashesMatch, signedFileUrl } = data;
 
             // IF hash unchanged: SKIP (continue)
+            if (hashesMatch) continue;
 
             // Generate embeddings
-
+            const embeddings = await processDocument(signedFileUrl, file.metadata.mimetype);
+            console.log(embeddings)
             // Delete old file analysis
 
             // Save embeddings and new hash of document
+        }
 
         return NextResponse.json(
-            { success: true, message: 'File deleted successfully' },
+            { success: true, message: 'Files embedded successfully' },
             { status: 200 }, // OK status
         );
     } catch (error) {
-        console.error('Error deleting file:', error);
+        console.error('Error embedding all files:', error);
 
         return NextResponse.json(
-            { success: false, error: 'Failed to delete file' },
+            { success: false, error: 'Failed to embed' },
             { status: 500 }, // Internal Server Error
         );
     }

@@ -9,6 +9,7 @@ import { FileContentOrSignedUrl, Metadata } from '~/types/files/db';
 import { ServerActionResponse, UploadData } from '~/types/api/response';
 import { FileObject, StorageError } from '@supabase/storage-js';
 import { getUserByUploadSecret } from './uploadsecret';
+import { calculateDocumentHash } from '../embeds/file-hash';
 
 export async function getStructure(): Promise<
     ServerActionResponse<ExtendedFileObject[]>
@@ -535,54 +536,4 @@ async function getPathTokens(
     }
 
     return data?.path_tokens; // Return only the path_tokens field or undefined if not found
-}
-
-export async function getUnanalysedFiles() {
-    // Get supabase client and parameters
-    const supabase = createClient('storage');
-    // Fetch authenticated user
-    const user = await getProfile();
-    if (!user) return { data: null, error: 'Unauthorized', status: 401 };
-    const userId = user.id;
-
-    // Retrieve files with a updatedAt younger than their analysis or with no analysis at all
-    // Get all storage objects
-    const { data: storageObjects, error: storageError } = await supabase
-        .storage
-        .from(env.SUPABASE_BUCKET_NAME)
-        .list(userId, {
-            limit: 1000,
-            sortBy: { column: 'updated_at', order: 'desc' }
-        });
-
-    if (storageError) {
-        console.error('Error fetching storage objects:', storageError);
-        return { data: null, error: 'Failed to fetch files', status: 500 };
-    }
-
-    // Get all document analyses
-    const { data: analyses, error: analysesError } = await supabase
-        .from('document_analyses')
-        .select('storage_object_id, documentHash, updatedAt, createdAt')
-        .eq('user_id', userId);
-    
-    if (analysesError) {
-        console.error('Error fetching analyses:', analysesError);
-        return { data: null, error: 'Failed to fetch analyses', status: 500 };
-    }
-
-    const unanalysedFiles = storageObjects.filter(file => {
-        // Get analysis for this file
-        const analysis = analyses.find(a => a.storage_object_id === file.id);
-        
-        if (!analysis) return true;
-        
-        // Check if file was updated after analysis
-        const fileDate = new Date(file.updated_at);
-        const analysisDate = new Date(analysis.createdAt);
-        
-        return fileDate > analysisDate;
-    });
-
-    return { data: unanalysedFiles, error: null, status: 200 };
 }
