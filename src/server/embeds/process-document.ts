@@ -1,4 +1,7 @@
+import OpenAI from 'openai';
 import PDFParser from 'pdf2json';
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
+import { cleanText } from '~/lib/utils';
 
 export async function processDocument(
     fileResponse: Response,
@@ -8,20 +11,29 @@ export async function processDocument(
     const text = await extractTextFromFile(fileResponse, mimetype);
 
     // Split into chunks
-    //   const chunks = chunkText(text, 1000, 200) // size, overlap
+    const cleanedText = cleanText(text);
+    const splitter = new RecursiveCharacterTextSplitter({
+        chunkSize: 1000,
+        chunkOverlap: 200,
+    });
 
-    //   // Generate embeddings for each chunk
-    //   const chunksWithEmbeddings = await Promise.all(
-    //     chunks.map(async (chunk) => {
-    //       const { embedding } = await embed({
-    //         model: openai.embedding('text-embedding-3-small'),
-    //         value: chunk,
-    //       })
-    //       return { content: chunk, embedding }
-    //     })
-    //   )
+    const chunks = await splitter.splitText(cleanedText);
 
-    return text; //chunksWithEmbeddings
+    const openai = new OpenAI();
+
+    // Generate embeddings for each chunk
+    const embeddings = await Promise.all(
+        chunks.map(async (chunk) => {
+            const embedding = await openai.embeddings.create({
+                model: 'mistral-embed-7b',
+                input: chunk,
+                encoding_format: 'float',
+            });
+            return { content: chunk, embedding };
+        }),
+    );
+
+    return embeddings;
 }
 
 async function extractTextFromFile(
@@ -31,7 +43,6 @@ async function extractTextFromFile(
     let text = '';
 
     if (fileType.startsWith('text/plain')) {
-        // TODO: Remove all HTML tags
         text = await fileResponse.text();
     } else if (fileType.startsWith('application/pdf')) {
         const buffer = await fileResponse.arrayBuffer();
@@ -48,12 +59,31 @@ async function extractTextFromFile(
 async function extractTextFromPDF(buffer: ArrayBuffer): Promise<string> {
     return new Promise((resolve, reject) => {
         const pdfParser = new PDFParser();
+
         pdfParser.on('pdfParser_dataError', (errData) =>
             reject((errData as { parserError: Error }).parserError),
         );
-        pdfParser.on('pdfParser_dataReady', () => {
+
+        pdfParser.on('pdfParser_dataReady', (pdfData: any) => {
             try {
-                const text = pdfParser.getRawTextContent();
+                let pages = pdfData.formImage?.Pages ?? pdfData.Pages;
+
+                if (!pages) {
+                    return reject(
+                        new Error(
+                            "PDF data structure unexpected: 'Pages' missing.",
+                        ),
+                    );
+                }
+
+                const text = pages
+                    .map((page: any) =>
+                        page.Texts.map((textItem: any) =>
+                            decodeURIComponent(textItem.R[0].T),
+                        ).join(' '),
+                    )
+                    .join('\n\n');
+
                 resolve(text);
             } catch (error) {
                 reject(error);

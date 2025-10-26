@@ -25,7 +25,7 @@ import Link from '@tiptap/extension-link';
 import Text from '@tiptap/extension-text';
 import Typography from '@tiptap/extension-typography';
 import React, { useEffect, useState } from 'react';
-import { cn } from '~/hooks/utils';
+import { cn } from '~/lib/utils';
 import useDebounce from '~/hooks/use-debounce';
 import removeExtension from '~/hooks/files/removeExtension';
 import { useQueryClient } from '@tanstack/react-query';

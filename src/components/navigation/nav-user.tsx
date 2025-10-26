@@ -29,7 +29,7 @@ import {
 } from '~/components/ui/sidebar';
 import { signOut } from 'next-auth/react';
 import { Button } from '~/components/ui/button';
-import { getInitials } from '~/hooks/utils';
+import { getInitials } from '~/lib/utils';
 
 export function NavUser({
     user,

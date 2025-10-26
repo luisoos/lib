@@ -1,6 +1,7 @@
-import * as React from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import striptags from 'striptags';
+import removeMd from 'remove-markdown';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -33,4 +34,10 @@ export function trimUnfinishedSentence(text: string): string {
         finishedSentences.pop();
     }
     return finishedSentences.join(' ').trim();
+}
+
+export function cleanText(input: string): string {
+    let withoutHtml = striptags(input);
+    let clean = removeMd(withoutHtml);
+    return clean.replace(/\s+/g, ' ').trim();
 }

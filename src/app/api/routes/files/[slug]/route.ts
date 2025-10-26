@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import validateQuery from '~/hooks/validateQuery';
+import validateQuery from '~/lib/validateQuery';
 import {
     deleteFile,
     getFileById,

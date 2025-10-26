@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { trimUnfinishedSentence } from '~/hooks/utils';
+import { trimUnfinishedSentence } from '~/lib/utils';
 import { Message } from '~/types/ai-chat';
 import { toast } from './use-toast';
 

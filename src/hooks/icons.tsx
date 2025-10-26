@@ -2,7 +2,7 @@ import * as Lucide from 'lucide-react';
 import * as SimpleIcons from 'simple-icons';
 import { LucideIcon } from 'lucide-react';
 import type { SimpleIcon } from 'simple-icons';
-import { ucfirst } from '~/hooks/utils';
+import { ucfirst } from '~/lib/utils';
 
 export type LucideIconName = keyof typeof Lucide;
 

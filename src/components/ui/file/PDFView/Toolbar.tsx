@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Highlighter, Minus, Plus } from 'lucide-react';
-import { cn } from '~/hooks/utils';
+import { cn } from '~/lib/utils';
 
 interface ToolbarProps {
     setPdfScaleValue: (value: number) => void;

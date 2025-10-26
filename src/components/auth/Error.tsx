@@ -2,7 +2,7 @@
 
 import { ShieldAlert } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import validateQuery from '~/hooks/validateQuery';
+import validateQuery from '~/lib/validateQuery';
 
 export default function Error() {
     const searchParams = useSearchParams();

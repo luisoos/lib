@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '~/hooks/utils';
+import { cn } from '~/lib/utils';
 import { ContextMenuAction } from '~/components/ui/context-menu';
 
 export interface ContextMenuProps {

@@ -1,5 +1,5 @@
 import { Editor } from '@tiptap/core';
-import { cn } from '~/hooks/utils';
+import { cn } from '~/lib/utils';
 
 export default function getButtonClasses(
     editor: Editor,

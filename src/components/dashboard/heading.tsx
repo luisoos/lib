@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { cn } from '~/hooks/utils';
+import { cn } from '~/lib/utils';
 
 export function Title({
     className,

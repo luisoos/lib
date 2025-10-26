@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import getFileUrl from '~/hooks/files/getFileUrl';
-import validateQuery from '~/hooks/validateQuery';
+import validateQuery from '~/lib/validateQuery';
 import { getStructure, uploadFile } from '~/server/api/files';
 import { ErrorMessage } from '~/types/api/response';
 

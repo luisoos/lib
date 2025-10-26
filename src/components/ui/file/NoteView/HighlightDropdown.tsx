@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Editor } from '@tiptap/core';
-import { cn } from '~/hooks/utils';
+import { cn } from '~/lib/utils';
 import { Circle, CircleSlash } from 'lucide-react';
 import getButtonClasses from './getButtonClasses';
 import { motion } from 'framer-motion';

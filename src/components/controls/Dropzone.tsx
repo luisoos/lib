@@ -4,7 +4,7 @@ import React from 'react';
 import { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import upload from '~/hooks/files/upload';
-import { cn } from '~/hooks/utils';
+import { cn } from '~/lib/utils';
 import FileTreeContextMenu from '~/components/controls/FileTreeContextMenu';
 import ControlComponentProps from '~/types/controls/ControlComponentProps';
 

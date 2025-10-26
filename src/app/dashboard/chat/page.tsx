@@ -6,7 +6,7 @@ import { Input } from '~/components/ui/input';
 import { Card } from '~/components/ui/card';
 import { Send, Bot, User, Trash2, Loader2 } from 'lucide-react';
 import useAiStream from '~/hooks/use-ai-stream';
-import { cn } from '~/hooks/utils';
+import { cn } from '~/lib/utils';
 import { Streamdown } from 'streamdown';
 import ChatHistory from '~/components/ai-chat/chat-history';
 

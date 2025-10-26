@@ -102,8 +102,8 @@ export async function compareHashes(fileName: string, analysisHash: string) {
     }
 
     const response = await fetch(data.signedUrl);
-    const responseCloneForHash = response.clone()
-    const responseCloneForReturn = response.clone()
+    const responseCloneForHash = response.clone();
+    const responseCloneForReturn = response.clone();
     const arrayBuffer = await responseCloneForHash.arrayBuffer();
     const documentHash = await calculateDocumentHash(arrayBuffer);
 

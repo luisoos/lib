@@ -63,7 +63,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
                     <SidebarMenuButton asChild>
                         <Link href='/dashboard/chat'>
                             {/* TODO: sparkle not visible*/}
-                            <Sparkle className='w-4 h-4 bg-gradient-to-t from-blue-500 via-purple-500 to-yellow-500 bg-clip-text text-transparent' />
+                            <Sparkle className='w-4 h-4 text-purple-600' />
                             <span>Chat</span>
                         </Link>
                     </SidebarMenuButton>

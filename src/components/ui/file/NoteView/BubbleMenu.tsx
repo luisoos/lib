@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import getButtonClasses from '~/components/ui/file/NoteView/getButtonClasses';
-import { cn } from '~/hooks/utils';
+import { cn } from '~/lib/utils';
 import { HighlightDropdown } from './HighlightDropdown';
 import { motion } from 'framer-motion';
 
