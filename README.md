@@ -1,8 +1,6 @@
 # `/lib`
 
-Chat with all of your documents at once. Perfect for school & university.
-
-> [!NOTE] > `/lib` is a web-based SaaS that lets users use huge context-aware vector AI.
+Chat with all of your documents at once. Perfect UX, great integrations.
 
 ## To-do
 
